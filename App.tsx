@@ -329,7 +329,7 @@ const App: React.FC = () => {
   // Fix: Added effect to fetch briefing with all required arguments (level, score, language)
   useEffect(() => {
     getPilotBriefing(level, score, language).then(setBriefing);
-  }, [level, language]);
+  }, [level, score, language]);
 
   const UnitPreview = ({ type, subType, label, desc, hp, dmg, colorClass, bgClass }: any) => {
     const pc = useRef<HTMLCanvasElement>(null);
@@ -362,7 +362,7 @@ const App: React.FC = () => {
         <div className="flex items-center gap-4 flex-1 justify-end">
           <div className="flex flex-col items-end gap-1">
             <div className="w-32 h-2.5 bg-slate-800 rounded-full overflow-hidden border border-slate-700"><div className={`h-full transition-all duration-300 ${health / maxHealth < 0.3 ? 'bg-rose-500' : 'bg-sky-500'}`} style={{ width: `${(health / maxHealth) * 100}%` }} /></div>
-            <span className={`text-[10px] font-bold uppercase ${difficulty === 'easy' ? 'text-green-500' : 'text-sky-400'}`}>{t[difficulty]} MODE</span>
+            <span className={`text-[10px] font-bold uppercase ${difficulty === 'easy' ? 'text-green-500' : difficulty === 'hard' ? 'text-rose-500' : 'text-sky-400'}`}>{t[difficulty]} MODE</span>
           </div>
           <Shield className={`w-5 h-5 ${health / maxHealth < 0.3 ? 'text-rose-500 animate-pulse' : 'text-sky-400'}`} />
         </div>
@@ -381,7 +381,7 @@ const App: React.FC = () => {
               {briefing && (
                 <div className="text-left space-y-4">
                   <h3 className="text-xl font-bold uppercase italic text-white tracking-widest border-l-4 border-sky-500 pl-3">{briefing.title}</h3>
-                  <p className="text-sm text-slate-300 leading-relaxed font-mono italic">"{briefing.message}"</p>
+                  <p className="text-sm text-slate-300 leading-relaxed font-mono italic">{briefing.message}</p>
                   <div className="pt-3 border-t border-slate-800 bg-slate-950/40 p-3 rounded-lg">
                     <p className="text-xs font-bold uppercase text-sky-300 flex items-center gap-2 mb-1"><Zap className="w-3 h-3" /> {t.combatAdviceLabel}:</p>
                     <p className="text-xs text-slate-400 italic">{briefing.tacticalAdvice}</p>
@@ -436,7 +436,7 @@ const App: React.FC = () => {
                   <div className="grid grid-cols-5 gap-2">{(Object.keys(translations) as Language[]).map(l => <button key={l} onClick={() => setLanguage(l)} className={`py-2 rounded font-bold text-xs ${language === l ? 'bg-sky-500 text-slate-950' : 'bg-slate-800'}`}>{l.toUpperCase()}</button>)}</div>
                 </div>
                 <div><label className="text-slate-400 text-[10px] uppercase block mb-2">{t.difficulty}</label>
-                  <div className="grid grid-cols-3 gap-2 bg-slate-950 p-1 rounded-xl">{(['easy', 'normal', 'hard'] as Difficulty[]).map(d => <button key={d} onClick={() => setDifficulty(d)} className={`py-2 rounded font-black text-[10px] ${difficulty === d ? 'bg-sky-500 text-slate-950' : 'text-slate-500'}`}>{t[d]}</button>)}</div>
+                  <div className="grid grid-cols-3 gap-2 bg-slate-950 p-1 rounded-xl">{(['easy', 'normal', 'hard'] as Difficulty[]).map(d => <button key={d} onClick={() => setDifficulty(d)} className={`py-2 rounded font-black text-[10px] ${difficulty === d ? (d === 'easy' ? 'bg-green-500 text-slate-950' : d === 'hard' ? 'bg-rose-500 text-slate-950' : 'bg-sky-500 text-slate-950') : 'text-slate-500'}`}>{t[d]}</button>)}</div>
                 </div>
               </div>
               <button onClick={() => setShowSettings(false)} className="w-full mt-8 py-3 bg-slate-800 hover:bg-slate-700 font-bold rounded-xl uppercase">OK</button>
