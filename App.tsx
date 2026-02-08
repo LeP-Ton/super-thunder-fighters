@@ -154,6 +154,24 @@ const App: React.FC = () => {
     }
   }, []);
 
+  const returnToHome = () => {
+    const mults = getDifficultyMults(difficulty);
+    setScore(0);
+    setLevel(1);
+    setHealth(mults.playerHp);
+    setMaxHealth(mults.playerHp);
+    setShowIntel(false);
+    setShowSettings(false);
+    gameStateRef.current = {
+      player: {
+        id: 'player', pos: { x: CANVAS_WIDTH / 2 - PLAYER_SIZE / 2, y: CANVAS_HEIGHT - 100 }, size: { x: PLAYER_SIZE, y: PLAYER_SIZE },
+        velocity: { x: 0, y: 0 }, health: mults.playerHp, maxHealth: mults.playerHp, type: 'player', lastShot: 0
+      },
+      enemies: [], bullets: [], particles: [], score: 0, level: 1, status: GameStatus.START, difficulty: difficulty
+    };
+    setStatus(GameStatus.START);
+  };
+
   const initGame = () => {
     const mults = getDifficultyMults(difficulty);
     setScore(0); setLevel(1); setHealth(mults.playerHp); setMaxHealth(mults.playerHp);
@@ -251,8 +269,12 @@ const App: React.FC = () => {
         }
       } else {
         if (b.pos.x > player.pos.x && b.pos.x < player.pos.x + player.size.x && b.pos.y > player.pos.y && b.pos.y < player.pos.y + player.size.y) {
-          player.health -= 5; setHealth(player.health); createParticles(b.pos.x, b.pos.y, b.color); bullets.splice(i, 1);
-          if (player.health <= 0) setStatus(GameStatus.GAMEOVER);
+          const nextHealth = Math.max(0, player.health - 5);
+          player.health = nextHealth;
+          setHealth(nextHealth);
+          createParticles(b.pos.x, b.pos.y, b.color);
+          bullets.splice(i, 1);
+          if (nextHealth <= 0) setStatus(GameStatus.GAMEOVER);
         }
       }
     }
@@ -283,8 +305,12 @@ const App: React.FC = () => {
       if (e.pos.y > CANVAS_HEIGHT) { enemies.splice(i, 1); continue; }
 
       if (e.pos.x < player.pos.x + player.size.x && e.pos.x + e.size.x > player.pos.x && e.pos.y < player.pos.y + player.size.y && e.pos.y + e.size.y > player.pos.y) {
-        player.health -= 25; setHealth(player.health); createParticles(e.pos.x + e.size.x/2, e.pos.y + e.size.y/2, eColors.main); enemies.splice(i, 1);
-        if (player.health <= 0) setStatus(GameStatus.GAMEOVER);
+        const nextHealth = Math.max(0, player.health - 25);
+        player.health = nextHealth;
+        setHealth(nextHealth);
+        createParticles(e.pos.x + e.size.x/2, e.pos.y + e.size.y/2, eColors.main);
+        enemies.splice(i, 1);
+        if (nextHealth <= 0) setStatus(GameStatus.GAMEOVER);
       }
     }
 
@@ -422,7 +448,7 @@ const App: React.FC = () => {
                   </div>
                 </section>
               </div>
-              <div className="p-4 border-t border-sky-500/20 text-center"><button onClick={() => setShowIntel(false)} className="px-10 py-2 bg-sky-500 text-slate-950 font-bold rounded-full uppercase italic">{t.return}</button></div>
+              <div className="p-4 border-t border-sky-500/20 text-center"><button onClick={() => setShowIntel(false)} className="px-10 py-2 bg-sky-500 text-slate-950 font-bold rounded-full uppercase italic">{t.backHome}</button></div>
             </div>
           </div>
         )}
@@ -448,7 +474,10 @@ const App: React.FC = () => {
           <div className="absolute inset-0 bg-rose-950/90 backdrop-blur-lg flex flex-col items-center justify-center rounded-xl p-8 text-center z-50">
             <h2 className="text-6xl font-black mb-2 text-rose-500 italic uppercase">{t.missionFailed}</h2>
             <div className="mb-8"><span className="text-slate-400 text-xs block uppercase mb-1">{t.finalScore}</span><span className="text-4xl font-mono font-bold text-white">{score.toLocaleString()}</span></div>
-            <button onClick={initGame} className="flex items-center gap-3 px-10 py-4 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-full transform hover:scale-110"><RotateCcw className="w-5 h-5" /> {t.redeploy}</button>
+            <div className="flex flex-col gap-3">
+              <button onClick={initGame} className="flex items-center justify-center gap-3 px-10 py-4 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-full transform hover:scale-110"><RotateCcw className="w-5 h-5" /> {t.redeploy}</button>
+              <button onClick={returnToHome} className="flex items-center justify-center gap-3 px-10 py-4 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-full transform hover:scale-110"><Terminal className="w-5 h-5" /> {t.backHome}</button>
+            </div>
           </div>
         )}
       </div>
