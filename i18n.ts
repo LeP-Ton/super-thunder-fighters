@@ -34,6 +34,38 @@ export const translations = {
     briefingTitle: "Tactical Briefing",
     combatAdviceLabel: "Combat Advice",
     langName: "English",
+    hangarTitle: "Hangar",
+    hangarHint: "Select 3 aircraft for deployment.",
+    hangarCount: "Selected {count}/3",
+    energy: "Energy",
+    ready: "READY",
+    readyAtFull: "Full energy to switch",
+    planeNames: {
+      vanguard: "Vanguard",
+      strider: "Strider",
+      tempest: "Tempest",
+      aegis: "Aegis",
+      nova: "Nova",
+      specter: "Specter"
+    },
+    planeRoles: {
+      vanguard: "Balanced frontline fighter",
+      strider: "High-speed interceptor",
+      tempest: "Rapid-fire skirmisher",
+      aegis: "Heavy armor bulwark",
+      nova: "High-damage artillery",
+      specter: "Long-range striker"
+    },
+    planeTraits: {
+      vanguard: "Stable output and reliable handling.",
+      strider: "Dual shots; kills trigger a short speed boost.",
+      tempest: "Sustained fire causes overheat.",
+      aegis: "Takes reduced damage.",
+      nova: "Shells splash nearby targets.",
+      specter: "Piercing shots, fragile hull."
+    },
+    speed: "SPD",
+    fireRate: "ROF",
     swarm: "Swarm Interceptor",
     kamikaze: "Kamikaze Drone",
     elite: "Elite Attacker",
@@ -89,6 +121,38 @@ export const translations = {
     briefingTitle: "战术简报",
     combatAdviceLabel: "战斗建议",
     langName: "中文",
+    hangarTitle: "机库",
+    hangarHint: "选择 3 架战机出战。",
+    hangarCount: "已选 {count}/3",
+    energy: "能量",
+    ready: "就绪",
+    readyAtFull: "能量满可切换",
+    planeNames: {
+      vanguard: "先锋号",
+      strider: "迅影",
+      tempest: "风暴",
+      aegis: "盾卫",
+      nova: "新星",
+      specter: "幽影"
+    },
+    planeRoles: {
+      vanguard: "均衡前线战机",
+      strider: "高速拦截机",
+      tempest: "速射游击机",
+      aegis: "重装堡垒机",
+      nova: "高伤炮击机",
+      specter: "长程突击机"
+    },
+    planeTraits: {
+      vanguard: "输出稳定，操控可靠。",
+      strider: "双发射击；击杀触发短暂加速。",
+      tempest: "持续开火会过热。",
+      aegis: "受到伤害降低。",
+      nova: "炮弹可溅射周围目标。",
+      specter: "穿透射击，机体脆弱。"
+    },
+    speed: "速度",
+    fireRate: "射速",
     swarm: "集群拦截机",
     kamikaze: "自爆无人机",
     elite: "精英攻击机",
@@ -144,6 +208,38 @@ export const translations = {
     briefingTitle: "战术ブリーフィング",
     combatAdviceLabel: "戦闘アドバイス",
     langName: "日本語",
+    hangarTitle: "ハンガー",
+    hangarHint: "出撃する機体を3機選択してください。",
+    hangarCount: "選択 {count}/3",
+    energy: "エネルギー",
+    ready: "準備完了",
+    readyAtFull: "満タンで切替",
+    planeNames: {
+      vanguard: "ヴァンガード",
+      strider: "ストライダー",
+      tempest: "テンペスト",
+      aegis: "イージス",
+      nova: "ノヴァ",
+      specter: "スペクター"
+    },
+    planeRoles: {
+      vanguard: "バランス型前線機",
+      strider: "高速インターセプター",
+      tempest: "速射スカーミッシャー",
+      aegis: "重装防衛機",
+      nova: "高火力砲撃機",
+      specter: "長距離ストライカー"
+    },
+    planeTraits: {
+      vanguard: "安定した火力と扱いやすさ。",
+      strider: "二連射。撃破で短時間スピード上昇。",
+      tempest: "連射し続けるとオーバーヒート。",
+      aegis: "被ダメージ軽減。",
+      nova: "着弾時に周囲へスプラッシュ。",
+      specter: "貫通弾だが装甲は脆い。"
+    },
+    speed: "速度",
+    fireRate: "連射",
     swarm: "スウォーム・インターセプター",
     kamikaze: "カミカゼ・ドローン",
     elite: "エリート・アタッカー",
@@ -199,6 +295,38 @@ export const translations = {
     briefingTitle: "전술 브리핑",
     combatAdviceLabel: "전투 조언",
     langName: "한국어",
+    hangarTitle: "격납고",
+    hangarHint: "출격할 기체 3대를 선택하세요.",
+    hangarCount: "선택 {count}/3",
+    energy: "에너지",
+    ready: "준비 완료",
+    readyAtFull: "에너지 만땅 전환",
+    planeNames: {
+      vanguard: "뱅가드",
+      strider: "스트라이더",
+      tempest: "템페스트",
+      aegis: "이지스",
+      nova: "노바",
+      specter: "스펙터"
+    },
+    planeRoles: {
+      vanguard: "균형형 전선 기체",
+      strider: "고속 요격기",
+      tempest: "속사 스커미셔",
+      aegis: "중장갑 방벽기",
+      nova: "고화력 포격기",
+      specter: "장거리 스트라이커"
+    },
+    planeTraits: {
+      vanguard: "출력이 안정적이고 조작이 쉽다.",
+      strider: "이중 사격, 처치 시 잠시 가속.",
+      tempest: "연속 사격 시 과열.",
+      aegis: "받는 피해 감소.",
+      nova: "탄이 주변에 스플래시 피해.",
+      specter: "관통 사격, 기체가 약함."
+    },
+    speed: "속도",
+    fireRate: "연사",
     swarm: "스웜 인터셉터",
     kamikaze: "자폭 드론",
     elite: "엘리트 어태커",
@@ -254,6 +382,38 @@ export const translations = {
     briefingTitle: "Тактический инструктаж",
     combatAdviceLabel: "Советы",
     langName: "Русский",
+    hangarTitle: "Ангар",
+    hangarHint: "Выберите 3 корабля для вылета.",
+    hangarCount: "Выбрано {count}/3",
+    energy: "Энергия",
+    ready: "ГОТОВО",
+    readyAtFull: "Полная энергия для смены",
+    planeNames: {
+      vanguard: "Вангард",
+      strider: "Страйдер",
+      tempest: "Темпест",
+      aegis: "Эгида",
+      nova: "Нова",
+      specter: "Спектр"
+    },
+    planeRoles: {
+      vanguard: "Сбалансированный фронтовой истребитель",
+      strider: "Высокоскоростной перехватчик",
+      tempest: "Скорострельный рейдер",
+      aegis: "Тяжелый бронированный бастион",
+      nova: "Артиллерийский ударник",
+      specter: "Дальнобойный страйкер"
+    },
+    planeTraits: {
+      vanguard: "Стабильная огневая мощь и надежное управление.",
+      strider: "Два выстрела; убийства дают краткий рывок ускорения.",
+      tempest: "Длительная стрельба вызывает перегрев.",
+      aegis: "Получает сниженный урон.",
+      nova: "Снаряды наносят урон по области.",
+      specter: "Пробивные выстрелы, но хрупкий корпус."
+    },
+    speed: "СКР",
+    fireRate: "Скоростр.",
     swarm: "Перехватчик Роя",
     kamikaze: "Дрон-камикадзе",
     elite: "Элитный штурмовик",
@@ -284,3 +444,5 @@ export const translations = {
     ]
   }
 };
+
+export type Translation = typeof translations.en;

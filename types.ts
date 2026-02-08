@@ -8,6 +8,8 @@ export enum GameStatus {
 
 export type Difficulty = 'easy' | 'normal' | 'hard';
 
+export type PlaneId = 'vanguard' | 'strider' | 'tempest' | 'aegis' | 'nova' | 'specter';
+
 export interface Vector2 {
   x: number;
   y: number;
@@ -34,6 +36,9 @@ export interface Bullet {
   damage: number;
   owner: 'player' | 'enemy';
   color: string; // 新增：子弹颜色
+  pierce?: number;
+  splashRadius?: number;
+  splashDamageMult?: number;
 }
 
 export interface Particle {
@@ -42,6 +47,39 @@ export interface Particle {
   velocity: Vector2;
   life: number;
   color: string;
+}
+
+export interface PlaneState {
+  health: number;
+  maxHealth: number;
+  lastShot: number;
+  heat: number;
+  overheatUntil: number;
+  speedBoostUntil: number;
+}
+
+export interface PlaneDef {
+  id: PlaneId;
+  name: string;
+  role: string;
+  trait: string;
+  maxHealth: number;
+  size: number;
+  speed: number;
+  fireRate: number;
+  bulletSpeed: number;
+  bulletDamage: number;
+  shotSpread?: number[];
+  damageTakenMult?: number;
+  splashRadius?: number;
+  splashDamageMult?: number;
+  pierceCount?: number;
+  overheatPerShot?: number;
+  heatDecayPerSecond?: number;
+  overheatDuration?: number;
+  overheatSlowMult?: number;
+  speedBoostMult?: number;
+  speedBoostDuration?: number;
 }
 
 export interface GameState {
@@ -53,4 +91,7 @@ export interface GameState {
   level: number;
   status: GameStatus;
   difficulty: Difficulty;
+  activePlaneId: PlaneId;
+  planeStates: Record<PlaneId, PlaneState>;
+  energy: number;
 }
