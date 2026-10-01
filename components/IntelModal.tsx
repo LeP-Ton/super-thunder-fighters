@@ -18,7 +18,7 @@ export const IntelModal: React.FC<IntelModalProps> = ({ t, onClose }) => {
   ];
   return <div className="screen-overlay modal-overlay">
     <div className="modal-panel">
-      <div className="modal-header"><div><span className="eyebrow">ENEMY GALLERY / 04</span><h2>{t.intelTitle}</h2></div><button className="icon-button" onClick={onClose} aria-label={t.backHome}><X size={20} /></button></div>
+      <div className="modal-header"><div><span className="eyebrow">HOSTILE IDENTIFICATION / 04</span><h2>{t.intelTitle}</h2></div><button className="icon-button" onClick={onClose} aria-label={t.backHome}><X size={20} /></button></div>
       <div className="modal-intro"><p>{t.enemyFleetTitle}</p><strong>HOSTILE CONTACTS</strong></div>
       <div className="modal-scroll enemy-list">{units.map((unit) => <div className={'enemy-card enemy-' + unit.id} key={unit.id}>
         <div className="enemy-art"><img src={shipAssets[unit.id]} alt="" /></div>

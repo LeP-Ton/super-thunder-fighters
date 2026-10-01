@@ -1,67 +1,56 @@
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from '../constants';
 
-const stars = Array.from({ length: 105 }, (_, index) => ({
+const scene = typeof Image === 'undefined' ? null : new Image();
+if (scene) scene.src = '/assets/backgrounds/sector-orbit.png';
+
+const dust = Array.from({ length: 42 }, (_, index) => ({
   x: (index * 193.37 + 17) % CANVAS_WIDTH,
   y: (index * 311.91 + 29) % CANVAS_HEIGHT,
-  speed: 0.035 + (index % 7) * 0.028,
-  length: index % 13 === 0 ? 17 : index % 4 === 0 ? 8 : 3,
-  alpha: index % 5 === 0 ? 0.85 : 0.3
+  speed: 0.009 + (index % 5) * 0.008,
+  radius: index % 7 === 0 ? 1.2 : 0.55,
+  alpha: index % 8 === 0 ? 0.62 : 0.23
 }));
 
 export const drawBackground = (ctx: CanvasRenderingContext2D, time: number) => {
-  const base = ctx.createLinearGradient(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-  base.addColorStop(0, '#09081c');
-  base.addColorStop(0.5, '#10072b');
-  base.addColorStop(1, '#050914');
-  ctx.fillStyle = base;
+  ctx.fillStyle = '#050c16';
   ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-  const glow = ctx.createRadialGradient(300, 340, 30, 300, 340, 480);
-  glow.addColorStop(0, 'rgba(109, 26, 170, .22)');
-  glow.addColorStop(0.55, 'rgba(20, 81, 161, .11)');
-  glow.addColorStop(1, 'rgba(9, 8, 28, 0)');
-  ctx.fillStyle = glow;
+  if (scene?.complete && scene.naturalWidth) {
+    // 场景略放大后作慢速漂移，避免平铺接缝，也让战场保持真实的空间尺度。
+    const driftX = Math.sin(time * 0.000045) * 11;
+    const driftY = Math.cos(time * 0.000036) * 12;
+    ctx.drawImage(scene, -35 + driftX, -48 + driftY, CANVAS_WIDTH + 70, CANVAS_HEIGHT + 96);
+  }
+
+  const corridor = ctx.createLinearGradient(0, 0, CANVAS_WIDTH, 0);
+  corridor.addColorStop(0, 'rgba(1, 7, 14, .04)');
+  corridor.addColorStop(0.28, 'rgba(1, 7, 14, .16)');
+  corridor.addColorStop(0.72, 'rgba(1, 7, 14, .16)');
+  corridor.addColorStop(1, 'rgba(1, 7, 14, .04)');
+  ctx.fillStyle = corridor;
   ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-  // 透视跑道给纵向卷轴提供速度感，不干扰原有碰撞区域。
-  const travel = (time * 0.11) % 100;
-  ctx.save();
-  ctx.lineWidth = 1;
-  for (let y = -100 + travel; y < CANVAS_HEIGHT + 100; y += 100) {
-    const perspective = 0.3 + Math.max(0, y) / CANVAS_HEIGHT * 0.8;
-    ctx.strokeStyle = `rgba(55, 235, 255, ${0.05 + perspective * 0.07})`;
+  for (const particle of dust) {
+    const y = (particle.y + time * particle.speed) % CANVAS_HEIGHT;
+    ctx.fillStyle = `rgba(196, 220, 236, ${particle.alpha})`;
     ctx.beginPath();
-    ctx.moveTo(300 - 255 * perspective, y);
-    ctx.lineTo(300 + 255 * perspective, y);
+    ctx.arc(particle.x, y, particle.radius, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  ctx.save();
+  ctx.strokeStyle = 'rgba(152, 202, 222, .28)';
+  ctx.lineWidth = 1;
+  for (const [x, y, sx, sy] of [
+    [16, 16, 1, 1], [CANVAS_WIDTH - 16, 16, -1, 1],
+    [16, CANVAS_HEIGHT - 16, 1, -1],
+    [CANVAS_WIDTH - 16, CANVAS_HEIGHT - 16, -1, -1]
+  ]) {
+    ctx.beginPath();
+    ctx.moveTo(x + sx * 38, y);
+    ctx.lineTo(x, y);
+    ctx.lineTo(x, y + sy * 38);
     ctx.stroke();
   }
-  for (const side of [-1, 1]) {
-    for (let lane = 1; lane <= 3; lane++) {
-      ctx.strokeStyle = lane === 3 ? 'rgba(255, 58, 191, .17)' : 'rgba(52, 203, 255, .09)';
-      ctx.beginPath();
-      ctx.moveTo(300 + side * lane * 19, 0);
-      ctx.lineTo(300 + side * lane * 82, CANVAS_HEIGHT);
-      ctx.stroke();
-    }
-  }
-  ctx.restore();
-
-  for (const star of stars) {
-    const y = (star.y + time * star.speed) % CANVAS_HEIGHT;
-    ctx.fillStyle = `rgba(165, 229, 255, ${star.alpha})`;
-    ctx.fillRect(star.x, y, star.length > 10 ? 2 : 1, star.length);
-  }
-
-  ctx.save();
-  ctx.lineWidth = 2;
-  ctx.strokeStyle = 'rgba(82, 236, 255, .35)';
-  ctx.shadowColor = '#35dcff';
-  ctx.shadowBlur = 14;
-  ctx.beginPath();
-  ctx.moveTo(13, 77); ctx.lineTo(13, 13); ctx.lineTo(75, 13);
-  ctx.moveTo(CANVAS_WIDTH - 75, 13); ctx.lineTo(CANVAS_WIDTH - 13, 13); ctx.lineTo(CANVAS_WIDTH - 13, 77);
-  ctx.moveTo(13, CANVAS_HEIGHT - 77); ctx.lineTo(13, CANVAS_HEIGHT - 13); ctx.lineTo(75, CANVAS_HEIGHT - 13);
-  ctx.moveTo(CANVAS_WIDTH - 75, CANVAS_HEIGHT - 13); ctx.lineTo(CANVAS_WIDTH - 13, CANVAS_HEIGHT - 13); ctx.lineTo(CANVAS_WIDTH - 13, CANVAS_HEIGHT - 77);
-  ctx.stroke();
   ctx.restore();
 };

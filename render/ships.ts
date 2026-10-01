@@ -23,12 +23,12 @@ const projectileAssets: Record<ProjectileVisual, string> = {
 };
 
 const playerProjectileColors: Record<PlaneId, string> = {
-  vanguard: '#52e9ff',
-  strider: '#bdff48',
-  tempest: '#3dffc4',
-  aegis: '#ffe54f',
-  nova: '#ff8355',
-  specter: '#f15cff'
+  vanguard: '#95d5f4',
+  strider: '#d4e8f0',
+  tempest: '#b6d8ca',
+  aegis: '#e2c99b',
+  nova: '#e6a06a',
+  specter: '#b6afcb'
 };
 
 export const getPlayerProjectileColor = (planeId: PlaneId) => playerProjectileColors[planeId];
@@ -48,32 +48,32 @@ const getImage = (source: string) => {
 export const getUnitColor = (type: 'player' | 'enemy', subType?: EnemySubType) => {
   if (type === 'player') return { main: COLORS.PLAYER, flame: COLORS.PLAYER_FLAME, bullet: COLORS.PLAYER_BULLET };
   switch (subType) {
-    case 'kamikaze': return { main: COLORS.ENEMY_KAMIKAZE, flame: '#ff983d', bullet: COLORS.ENEMY_KAMIKAZE };
-    case 'elite': return { main: COLORS.ENEMY_ELITE, flame: '#f269ff', bullet: COLORS.ENEMY_ELITE };
-    case 'super': return { main: COLORS.ENEMY_SUPER, flame: '#ff56c2', bullet: COLORS.ENEMY_SUPER };
-    default: return { main: COLORS.ENEMY_GRUNT, flame: '#c3ff4e', bullet: COLORS.ENEMY_GRUNT };
+    case 'kamikaze': return { main: COLORS.ENEMY_KAMIKAZE, flame: '#e9a15c', bullet: COLORS.ENEMY_KAMIKAZE };
+    case 'elite': return { main: COLORS.ENEMY_ELITE, flame: '#d98a5e', bullet: COLORS.ENEMY_ELITE };
+    case 'super': return { main: COLORS.ENEMY_SUPER, flame: '#e4a35d', bullet: COLORS.ENEMY_SUPER };
+    default: return { main: COLORS.ENEMY_GRUNT, flame: '#d39060', bullet: COLORS.ENEMY_GRUNT };
   }
 };
 
 const drawExhaust = (ctx: CanvasRenderingContext2D, x: number, y: number, radius: number, color: string, reverse: boolean, time: number) => {
-  const pulse = 0.82 + Math.sin(time / 62 + x) * 0.18;
-  const endY = y + (reverse ? -1 : 1) * radius * 3.6 * pulse;
+  const pulse = 0.86 + Math.sin(time / 82 + x) * 0.14;
+  const endY = y + (reverse ? -1 : 1) * radius * 2.7 * pulse;
   const flame = ctx.createLinearGradient(x, y, x, endY);
-  flame.addColorStop(0, '#fff');
-  flame.addColorStop(0.12, color);
-  flame.addColorStop(0.48, color);
+  flame.addColorStop(0, '#f9f3e5');
+  flame.addColorStop(0.16, color);
+  flame.addColorStop(0.52, color);
   flame.addColorStop(1, 'transparent');
   ctx.save();
   ctx.globalCompositeOperation = 'screen';
   ctx.shadowColor = color;
-  ctx.shadowBlur = radius * 2.9;
+  ctx.shadowBlur = radius * 1.5;
   ctx.fillStyle = flame;
   ctx.beginPath();
   ctx.moveTo(x - radius * 0.46, y);
   ctx.quadraticCurveTo(x, endY, x + radius * 0.46, y);
   ctx.fill();
   ctx.fillStyle = '#fff';
-  ctx.globalAlpha = 0.78;
+  ctx.globalAlpha = 0.48;
   ctx.beginPath();
   ctx.moveTo(x - radius * 0.2, y);
   ctx.lineTo(x, endY * 0.58 + y * 0.42);
@@ -98,19 +98,23 @@ export const drawShip = (
   const isEnemy = type === 'enemy';
   const engineY = isEnemy ? y + h * 0.11 : y + h * 0.8;
   const engineOffset = w * (subType === 'grunt' || subType === 'kamikaze' ? 0 : 0.2);
-  drawExhaust(ctx, cx - engineOffset, engineY, w * 0.16, colors.flame, isEnemy, time);
-  if (engineOffset) drawExhaust(ctx, cx + engineOffset, engineY, w * 0.16, colors.flame, isEnemy, time + 19);
+  const exhaustColor = isEnemy ? colors.flame : playerVariant === 'vanguard' || playerVariant === 'strider' ? '#83c7f0' : '#eab77c';
+  drawExhaust(ctx, cx - engineOffset, engineY, w * 0.13, exhaustColor, isEnemy, time);
+  if (engineOffset) drawExhaust(ctx, cx + engineOffset, engineY, w * 0.13, exhaustColor, isEnemy, time + 19);
 
   const key = isEnemy ? subType ?? 'grunt' : playerVariant ?? 'vanguard';
   const image = getImage(shipAssets[key]);
   if (image) {
     ctx.save();
-    ctx.shadowColor = colors.main;
-    ctx.shadowBlur = type === 'player' ? 17 : 12;
+    ctx.shadowColor = isEnemy ? '#9b503a' : '#6c9fba';
+    ctx.shadowBlur = 6;
+    const visualScale = isEnemy ? 1.08 : 1.17;
+    const visualWidth = w * visualScale;
+    const visualHeight = h * visualScale;
     const imageRatio = image.naturalWidth / image.naturalHeight;
-    const boxRatio = w / h;
-    const drawWidth = imageRatio < boxRatio ? h * imageRatio : w;
-    const drawHeight = imageRatio < boxRatio ? h : w / imageRatio;
+    const boxRatio = visualWidth / visualHeight;
+    const drawWidth = imageRatio < boxRatio ? visualHeight * imageRatio : visualWidth;
+    const drawHeight = imageRatio < boxRatio ? visualHeight : visualWidth / imageRatio;
     ctx.drawImage(image, x + (w - drawWidth) / 2, y + (h - drawHeight) / 2, drawWidth, drawHeight);
     ctx.restore();
   } else {
@@ -129,34 +133,30 @@ export const drawProjectile = (ctx: CanvasRenderingContext2D, bullet: Bullet) =>
   const kind: ProjectileVisual = bullet.visual ?? (bullet.owner === 'enemy' ? 'enemy' : 'plasma');
   const image = getImage(projectileAssets[kind]);
   const isMissile = kind === 'missile';
-  const width = isMissile ? 22 : kind === 'enemy' ? 16 : bullet.damage >= 1.5 ? 18 : 15;
-  const height = isMissile ? 34 : bullet.pierce ? 36 : bullet.damage < 0.7 ? 24 : 28;
+  const width = isMissile ? 18 : kind === 'enemy' ? 12 : bullet.damage >= 1.5 ? 15 : 12;
+  const height = isMissile ? 33 : bullet.pierce ? 32 : bullet.damage < 0.7 ? 22 : 26;
   const { x, y } = bullet.pos;
-  const tail = bullet.owner === 'enemy' ? -25 : 25;
+  const tail = bullet.owner === 'enemy' ? -11 : 11;
 
   ctx.save();
   ctx.globalCompositeOperation = 'screen';
   ctx.strokeStyle = bullet.color;
-  ctx.globalAlpha = 0.78;
-  ctx.lineWidth = isMissile ? 4 : 6;
+  ctx.globalAlpha = 0.42;
+  ctx.lineWidth = isMissile ? 1.5 : 2.5;
   ctx.shadowColor = bullet.color;
-  ctx.shadowBlur = 20;
+  ctx.shadowBlur = 7;
   ctx.beginPath();
   ctx.moveTo(x, y);
   ctx.lineTo(x - bullet.velocity.x * 2.5, y + tail);
-  ctx.stroke();
-  ctx.strokeStyle = '#fff';
-  ctx.lineWidth = 1.5;
-  ctx.globalAlpha = 0.7;
   ctx.stroke();
   ctx.restore();
 
   ctx.save();
   ctx.globalCompositeOperation = 'screen';
   ctx.fillStyle = bullet.color;
-  ctx.globalAlpha = 0.38;
+  ctx.globalAlpha = 0.17;
   ctx.shadowColor = bullet.color;
-  ctx.shadowBlur = 23;
+  ctx.shadowBlur = 9;
   ctx.beginPath();
   ctx.ellipse(x, y, width * 0.35, height * 0.4, 0, 0, Math.PI * 2);
   ctx.fill();
@@ -165,7 +165,7 @@ export const drawProjectile = (ctx: CanvasRenderingContext2D, bullet: Bullet) =>
   if (image) {
     ctx.save();
     ctx.shadowColor = bullet.color;
-    ctx.shadowBlur = 13;
+    ctx.shadowBlur = 5;
     ctx.drawImage(image, x - width / 2, y - height / 2, width, height);
     ctx.restore();
   } else {

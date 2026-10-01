@@ -251,24 +251,18 @@ const App: React.FC = () => {
     ctx.setTransform(pixelRatioRef.current, 0, 0, pixelRatioRef.current, 0, 0);
     drawBackground(ctx, time);
     state.particles.forEach(p => {
-      const radius = 2 + (1 - p.life) * 7;
       ctx.save();
       ctx.globalAlpha = Math.max(0, p.life);
-      ctx.fillStyle = p.color;
-      ctx.shadowColor = p.color;
-      ctx.shadowBlur = 22;
-      ctx.translate(p.pos.x, p.pos.y);
-      ctx.rotate((1 - p.life) * 3.4);
+      ctx.strokeStyle = p.color;
+      ctx.lineWidth = Math.max(0.5, p.life * 2);
+      ctx.shadowColor = '#f1c091';
+      ctx.shadowBlur = 7;
       ctx.beginPath();
-      ctx.moveTo(0, -radius * 1.8);
-      ctx.lineTo(radius * 0.38, 0);
-      ctx.lineTo(0, radius * 1.8);
-      ctx.lineTo(-radius * 0.38, 0);
-      ctx.closePath();
-      ctx.fill();
-      ctx.fillStyle = '#ffffff';
-      ctx.globalAlpha *= 0.65;
-      ctx.fillRect(-1, -radius, 2, radius * 2);
+      ctx.moveTo(p.pos.x, p.pos.y);
+      ctx.lineTo(p.pos.x - p.velocity.x * 2.2, p.pos.y - p.velocity.y * 2.2);
+      ctx.stroke();
+      ctx.fillStyle = '#f6dfb2';
+      ctx.fillRect(p.pos.x - 1, p.pos.y - 1, 2, 2);
       ctx.restore();
     });
 
@@ -276,11 +270,11 @@ const App: React.FC = () => {
     state.enemies.forEach(e => {
       drawShip(ctx, 'enemy', e.subType, e.pos.x, e.pos.y, e.size.x, e.size.y, undefined, time);
       if (e.subType === 'elite' || e.subType === 'super') {
-        ctx.fillStyle = '#2b103e';
+        ctx.fillStyle = '#13212c';
         ctx.fillRect(e.pos.x, e.pos.y - 13, e.size.x, 4);
-        ctx.fillStyle = '#f44aca';
-        ctx.shadowColor = '#f44aca';
-        ctx.shadowBlur = 9;
+        ctx.fillStyle = '#e69c6b';
+        ctx.shadowColor = '#e69c6b';
+        ctx.shadowBlur = 3;
         ctx.fillRect(e.pos.x, e.pos.y - 13, e.size.x * (e.health / e.maxHealth), 4);
         ctx.shadowBlur = 0;
       }
@@ -377,21 +371,21 @@ const App: React.FC = () => {
       <div className="ambient ambient-two" />
       <header className="site-header">
         <div className="brand-lockup"><span className="brand-mark">✦</span><span>{t.title}</span></div>
-        <div className="header-meta"><span>NEON ARCADE / 01</span><span className="signal-dot" /> INSERT COIN · GO LIVE</div>
+        <div className="header-meta"><span>ORBITAL FRONT / 01</span><span className="signal-dot" /> BATTLE SYSTEM ONLINE</div>
       </header>
       <main className="game-layout">
         <section className="command-panel">
-          <div className="eyebrow">PLAYER ONE / READY</div>
+          <div className="eyebrow">FLEET COMMAND / ACTIVE</div>
           <h2>{t.title}</h2>
           <p>{t.subtitle}</p>
           <div className="command-divider" />
           <div className="selected-unit">
-            <span className="eyebrow">{t.hangarTitle} / SELECT FIGHTER</span>
+            <span className="eyebrow">{t.hangarTitle} / ACTIVE INTERCEPTOR</span>
             <img src={shipAssets[activePlaneId]} alt="" />
             <strong>{t.planeNames[activePlaneId]}</strong>
             <small>{t.planeRoles[activePlaneId]}</small>
           </div>
-          <div className="command-foot">STAGE 01 <span>●</span> HIGH SCORE</div>
+          <div className="command-foot">SECTOR 07 <span>●</span> SECURE LINK</div>
         </section>
         <section className={'play-column' + (status === GameStatus.PLAYING ? ' is-playing' : '')}>
           <HudBar score={score} level={level} health={health} maxHealth={maxHealth} energy={energy} difficulty={difficulty} t={t} />
@@ -444,13 +438,13 @@ const App: React.FC = () => {
           <div className="controls-hint">{isTouchDevice ? controlHints[language].touch : controlHints[language].keyboard}</div>
         </section>
         <aside className="status-panel">
-          <div className="eyebrow">ARCADE STATUS / LIVE</div>
+          <div className="eyebrow">MISSION TELEMETRY</div>
           <div className="status-number">{String(level).padStart(2, '0')}<small>LEVEL</small></div>
           <div className="status-line"><span>{t.score}</span><strong>{score.toString().padStart(6, '0')}</strong></div>
           <div className="status-line"><span>{t.integrity}</span><strong>{Math.ceil(health)} / {maxHealth}</strong></div>
           <div className="status-line"><span>{t.energy}</span><strong>{energy} / {ENERGY_MAX}</strong></div>
           <div className="radar"><div className="radar-sweep" /><span>◆</span></div>
-          <div className="eyebrow">COMBO READY · FULL THROTTLE</div>
+          <div className="eyebrow">LONG RANGE SCAN ACTIVE</div>
         </aside>
       </main>
     </div>
