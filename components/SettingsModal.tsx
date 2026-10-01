@@ -12,65 +12,15 @@ interface SettingsModalProps {
   onChangeDifficulty: (diff: Difficulty) => void;
 }
 
-export const SettingsModal: React.FC<SettingsModalProps> = ({
-  t,
-  language,
-  difficulty,
-  onClose,
-  onChangeLanguage,
-  onChangeDifficulty
-}) => {
-  return (
-    <div className="absolute inset-0 bg-slate-950/95 backdrop-blur-xl z-30 flex items-center justify-center p-6">
-      <div className="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-2xl p-6">
-        <div className="flex items-center justify-between mb-8 text-sky-400">
-          <h2 className="text-xl font-bold uppercase italic">{t.settings}</h2>
-          <button onClick={onClose}>
-            <X />
-          </button>
-        </div>
-        <div className="space-y-6">
-          <div>
-            <label className="text-slate-400 text-[10px] uppercase block mb-2">{t.langName}</label>
-            <div className="grid grid-cols-5 gap-2">
-              {(Object.keys(translations) as Language[]).map((l) => (
-                <button
-                  key={l}
-                  onClick={() => onChangeLanguage(l)}
-                  className={`py-2 rounded font-bold text-xs ${language === l ? 'bg-sky-500 text-slate-950' : 'bg-slate-800'}`}
-                >
-                  {l.toUpperCase()}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div>
-            <label className="text-slate-400 text-[10px] uppercase block mb-2">{t.difficulty}</label>
-            <div className="grid grid-cols-3 gap-2 bg-slate-950 p-1 rounded-xl">
-              {(['easy', 'normal', 'hard'] as Difficulty[]).map((d) => (
-                <button
-                  key={d}
-                  onClick={() => onChangeDifficulty(d)}
-                  className={`py-2 rounded font-black text-[10px] ${
-                    difficulty === d
-                      ? d === 'easy'
-                        ? 'bg-green-500 text-slate-950'
-                        : d === 'hard'
-                          ? 'bg-rose-500 text-slate-950'
-                          : 'bg-sky-500 text-slate-950'
-                      : 'text-slate-500'
-                  }`}
-                >
-                  {t[d]}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-        <button onClick={onClose} className="w-full mt-8 py-3 bg-slate-800 hover:bg-slate-700 font-bold rounded-xl uppercase">
-          OK
-        </button>
+export const SettingsModal: React.FC<SettingsModalProps> = ({ t, language, difficulty, onClose, onChangeLanguage, onChangeDifficulty }) => (
+  <div className="screen-overlay modal-overlay">
+    <div className="modal-panel settings-panel">
+      <div className="modal-header"><div><span className="eyebrow">SYSTEM CONFIGURATION</span><h2>{t.settings}</h2></div><button className="icon-button" onClick={onClose} aria-label={t.backHome}><X size={20} /></button></div>
+      <div className="settings-content">
+        <div className="setting-group"><span className="eyebrow">{t.langName} / LANGUAGE</span><div className="segmented languages">{(Object.keys(translations) as Language[]).map((item) => <button key={item} className={language === item ? 'active' : ''} onClick={() => onChangeLanguage(item)} aria-pressed={language === item}>{item.toUpperCase()}</button>)}</div></div>
+        <div className="setting-group"><span className="eyebrow">{t.difficulty} / DIFFICULTY</span><div className="segmented">{(['easy', 'normal', 'hard'] as Difficulty[]).map((item) => <button key={item} className={difficulty === item ? 'active' : ''} onClick={() => onChangeDifficulty(item)} aria-pressed={difficulty === item}>{t[item]}</button>)}</div><p>{t.difficultyDesc}</p></div>
       </div>
+      <div className="modal-footer"><span>SYSTEM READY</span><button className="secondary-button" onClick={onClose}>{t.backHome}</button></div>
     </div>
-  );
-};
+  </div>
+);

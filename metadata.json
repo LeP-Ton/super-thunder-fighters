@@ -1,5 +1,5 @@
 {
-  "name": "Thunder Strike AI: Galactic Vanguard",
-  "description": "A high-octane top-down scrolling shooter with AI-powered tactical briefings and procedural enemy waves.",
+  "name": "超级雷霆战机",
+  "description": "硬核科幻风格的纵向卷轴空战游戏，支持多机型切换、战术简报与动态敌机编队。",
   "requestFramePermissions": []
 }

@@ -9,7 +9,7 @@ export interface StaticBriefing {
 
 export const translations = {
   en: {
-    title: "Thunder Strike AI",
+    title: "Super Thunder Fighters",
     subtitle: "Neural link established. Commander, the galactic vanguard awaits your control.",
     initiate: "INITIATE MISSION",
     intel: "TACTICAL INTEL",
@@ -96,7 +96,7 @@ export const translations = {
     ]
   },
   zh: {
-    title: "雷霆战机 AI",
+    title: "超级雷霆战机",
     subtitle: "神经链接已建立。指挥官，先锋战机等待您的指令。",
     initiate: "开始任务",
     intel: "战术情报",
@@ -183,7 +183,7 @@ export const translations = {
     ]
   },
   ja: {
-    title: "サンダーストライク AI",
+    title: "スーパーサンダーファイターズ",
     subtitle: "ニューラルリンク確立。コマンダー、先遣隊があなたの指揮を待っています。",
     initiate: "ミッション開始",
     intel: "戦術情報",
@@ -270,7 +270,7 @@ export const translations = {
     ]
   },
   ko: {
-    title: "썬더 스트라이크 AI",
+    title: "슈퍼 썬더 파이터",
     subtitle: "신경 링크가 설정되었습니다.",
     initiate: "임무 시작",
     intel: "전술 정보",
@@ -357,7 +357,7 @@ export const translations = {
     ]
   },
   ru: {
-    title: "Thunder Strike AI",
+    title: "Супер громовые истребители",
     subtitle: "Нейронная связь установлена.",
     initiate: "НАЧАТЬ МИССИЮ",
     intel: "ТАКТИЧЕСКИЕ ДАННЫЕ",

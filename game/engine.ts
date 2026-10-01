@@ -1,7 +1,7 @@
-import { GameObject, GameState, GameStatus, PlaneDef, EnemySubType } from '../types';
+import { GameObject, GameState, GameStatus, PlaneDef, EnemySubType, Vector2 } from '../types';
 import { CANVAS_WIDTH, CANVAS_HEIGHT, ENEMY_SIZE, ENEMY_BASE_SPEED, ENEMY_FIRE_RATE, PARTICLE_COUNT } from '../constants';
 import { ENERGY_MAX, PLANE_BY_ID } from '../planes';
-import { getUnitColor } from '../render/ships';
+import { getPlayerProjectileColor, getUnitColor } from '../render/ships';
 import { getDifficultyMults } from './difficulty';
 import { applyKillEffects, getPlaneMoveSpeed, tryFirePlayer, updatePlaneHeat } from './planeBehaviors';
 
@@ -15,6 +15,8 @@ interface UpdateParams {
   lastTickRef: Ref<number>;
   defaultPlane: PlaneDef;
   draw: () => void;
+  touchTargetRef: Ref<Vector2 | null>;
+  autoFire: boolean;
   setScore: (value: number) => void;
   setLevel: (value: number) => void;
   setEnergy: (value: number) => void;
@@ -85,6 +87,8 @@ export const updateGame = ({
   lastTickRef,
   defaultPlane,
   draw,
+  touchTargetRef,
+  autoFire,
   setScore,
   setLevel,
   setEnergy,
@@ -120,13 +124,23 @@ export const updateGame = ({
   if (keys['ArrowRight'] || keys['d']) player.pos.x += moveSpeed;
   if (keys['ArrowUp'] || keys['w']) player.pos.y -= moveSpeed;
   if (keys['ArrowDown'] || keys['s']) player.pos.y += moveSpeed;
+  if (touchTargetRef.current) {
+    // 触摸目标沿用机型的移动速度，不改变现有速度和过热规则。
+    const dx = touchTargetRef.current.x - (player.pos.x + player.size.x / 2);
+    const dy = touchTargetRef.current.y - (player.pos.y + player.size.y / 2);
+    const distance = Math.hypot(dx, dy);
+    if (distance > 2) {
+      const step = Math.min(moveSpeed, distance);
+      player.pos.x += dx / distance * step;
+      player.pos.y += dy / distance * step;
+    }
+  }
 
   player.pos.x = Math.max(0, Math.min(CANVAS_WIDTH - player.size.x, player.pos.x));
   player.pos.y = Math.max(0, Math.min(CANVAS_HEIGHT - player.size.y, player.pos.y));
 
-  if (keys[' '] || keys['Enter']) {
-    const pColors = getUnitColor('player');
-    const newBullets = tryFirePlayer(activePlane, activePlaneState, player, time, pColors.bullet);
+  if (keys[' '] || keys['Enter'] || autoFire) {
+    const newBullets = tryFirePlayer(activePlane, activePlaneState, player, time, getPlayerProjectileColor(activePlane.id));
     if (newBullets.length > 0) bullets.push(...newBullets);
   }
 
@@ -234,7 +248,8 @@ export const updateGame = ({
               velocity: { x: ox, y: 5 * mults.speed },
               damage: 8,
               owner: 'enemy',
-              color: eColors.bullet
+              color: eColors.bullet,
+              visual: 'enemy'
             });
           }
           e.lastShot = time;
@@ -247,7 +262,8 @@ export const updateGame = ({
         velocity: { x: 0, y: (3.5 + state.level * 0.4) * mults.speed },
         damage: 5,
         owner: 'enemy',
-        color: eColors.bullet
+        color: eColors.bullet,
+        visual: 'enemy'
       });
       e.lastShot = time;
     }

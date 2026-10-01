@@ -1,22 +1,19 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# 超级雷霆战机
 
-# super-thunder-fighters
-超级雷霆战机
+硬核科幻风格的浏览器纵向卷轴射击游戏。玩家可从六架战机中选择三架出战，在战斗中积累能量并切换机型。
 
-# Run and deploy your AI Studio app
+## 本地运行
 
-This contains everything you need to run your app locally.
+需要 Node.js。
 
-View your app in AI Studio: https://ai.studio/apps/drive/18Z32Bo66GP_DiTFpupO5MtRNUffkSoXn
+- 安装依赖：npm install
+- 启动开发服务器：npm run dev
+- 类型检查：npx tsc --noEmit
+- 生产构建：npm run build
 
-## Run Locally
+## 操作
 
-**Prerequisites:**  Node.js
+- 桌面：WASD 或方向键移动，空格或 Enter 开火，数字键 1–3 切换战机，Esc 暂停。
+- 手机：在战场拖动战机移动，自动开火；能量满时点击上方战机切换，点击战场右上角暂停。
 
-
-1. Install dependencies:
-   `npm install`
-2. Run the app:
-   `npm run dev`
+战斗画面使用 Canvas 2D，机体与弹体图像保存在 public/assets/。

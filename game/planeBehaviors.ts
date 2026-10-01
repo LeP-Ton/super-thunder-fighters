@@ -50,6 +50,7 @@ export const tryFirePlayer = (
     damage: plane.bulletDamage,
     owner: 'player' as const,
     color: bulletColor,
+    visual: plane.id === 'nova' ? 'missile' as const : 'plasma' as const,
     pierce: plane.pierceCount ?? 0,
     splashRadius: plane.splashRadius,
     splashDamageMult: plane.splashDamageMult

@@ -36,6 +36,7 @@ export interface Bullet {
   damage: number;
   owner: 'player' | 'enemy';
   color: string; // 新增：子弹颜色
+  visual?: 'plasma' | 'missile' | 'enemy';
   pierce?: number;
   splashRadius?: number;
   splashDamageMult?: number;

@@ -1,11 +1,12 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { GameStatus, GameState, Difficulty, PlaneId } from './types';
-import { CANVAS_WIDTH, CANVAS_HEIGHT, BULLET_RADIUS } from './constants';
+import { CANVAS_WIDTH, CANVAS_HEIGHT } from './constants';
 import { PLANE_DEFS, PLANE_BY_ID, DEFAULT_LOADOUT, ENERGY_MAX } from './planes';
 import { getPilotBriefing, Briefing } from './services/geminiService';
 import { translations, Language } from './i18n';
-import { drawShip } from './render/ships';
+import { drawProjectile, drawShip, shipAssets } from './render/ships';
+import { drawBackground } from './render/background';
 import { updateGame } from './game/engine';
 import { buildPlaneStates } from './game/state';
 import { getDifficultyMults } from './game/difficulty';
@@ -19,8 +20,20 @@ import { GameOverOverlay, PauseOverlay } from './components/Overlays';
 
 // --- Main App Component ---
 
+const controlHints: Record<Language, { touch: string; keyboard: string }> = {
+  zh: { touch: '拖动战机 · 自动开火 · 点击战机切换', keyboard: 'WASD / 方向键移动 · 空格 / Enter 开火 · 1–3 切换 · Esc 暂停' },
+  en: { touch: 'Drag to move · Auto fire · Tap a fighter to switch', keyboard: 'WASD / Arrows to move · Space / Enter to fire · 1–3 to switch · Esc to pause' },
+  ja: { touch: 'ドラッグで移動 · 自動射撃 · 機体をタップして切替', keyboard: 'WASD / 矢印キーで移動 · Space / Enter で射撃 · 1–3 で切替 · Esc で一時停止' },
+  ko: { touch: '드래그 이동 · 자동 발사 · 전투기를 탭해 교체', keyboard: 'WASD / 방향키 이동 · Space / Enter 발사 · 1–3 교체 · Esc 일시정지' },
+  ru: { touch: 'Перетаскивайте для движения · Автоогонь · Нажмите на истребитель для смены', keyboard: 'WASD / стрелки — движение · Space / Enter — огонь · 1–3 — смена · Esc — пауза' }
+};
+
 const App: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const pixelRatioRef = useRef(1);
+  const touchTargetRef = useRef<{ x: number; y: number } | null>(null);
+  const activePointerRef = useRef<number | null>(null);
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
   const [status, setStatus] = useState<GameStatus>(GameStatus.START);
   const [score, setScore] = useState(0);
   const [level, setLevel] = useState(1);
@@ -40,7 +53,10 @@ const App: React.FC = () => {
 
   const t = translations[language];
 
-  
+  useEffect(() => {
+    document.title = t.title;
+    document.documentElement.lang = language;
+  }, [language, t.title]);
 
   const gameStateRef = useRef<GameState>({
     player: {
@@ -67,7 +83,31 @@ const App: React.FC = () => {
   const requestRef = useRef<number>();
   const lastTickRef = useRef<number>(0);
 
+  useEffect(() => {
+    const query = window.matchMedia('(pointer: coarse)');
+    const syncInput = () => setIsTouchDevice(query.matches);
+    syncInput();
+    query.addEventListener('change', syncInput);
+    return () => query.removeEventListener('change', syncInput);
+  }, []);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const syncResolution = () => {
+      const ratio = Math.min(2, window.devicePixelRatio || 1);
+      pixelRatioRef.current = ratio;
+      canvas.width = Math.round(CANVAS_WIDTH * ratio);
+      canvas.height = Math.round(CANVAS_HEIGHT * ratio);
+    };
+    syncResolution();
+    window.addEventListener('resize', syncResolution);
+    return () => window.removeEventListener('resize', syncResolution);
+  }, []);
+
   const returnToHome = () => {
+    touchTargetRef.current = null;
+    activePointerRef.current = null;
     const loadout = selectedPlanes.length === 3 ? selectedPlanes : DEFAULT_LOADOUT;
     const planeStates = buildPlaneStates(difficulty);
     const starterId = loadout[0];
@@ -111,6 +151,8 @@ const App: React.FC = () => {
 
   const initGame = () => {
     if (selectedPlanes.length !== 3) return;
+    touchTargetRef.current = null;
+    activePointerRef.current = null;
     const planeStates = buildPlaneStates(difficulty);
     const starterId = selectedPlanes[0];
     const starterDef = PLANE_BY_ID[starterId];
@@ -207,22 +249,25 @@ const App: React.FC = () => {
     const ctx = canvasRef.current?.getContext('2d');
     if (!ctx) return;
     const state = gameStateRef.current;
-    ctx.fillStyle = '#020617';
-    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-    ctx.fillStyle = '#1e293b';
-    for (let i = 0; i < 40; i++) ctx.fillRect((i * 153) % CANVAS_WIDTH, (Date.now() / 30 + i * 100) % CANVAS_HEIGHT, 1, 1);
+    const time = performance.now();
+    ctx.setTransform(pixelRatioRef.current, 0, 0, pixelRatioRef.current, 0, 0);
+    drawBackground(ctx, time);
     state.particles.forEach(p => {
-      ctx.globalAlpha = p.life;
+      const radius = 2 + (1 - p.life) * 5;
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, p.life);
       ctx.fillStyle = p.color;
+      ctx.shadowColor = p.color;
+      ctx.shadowBlur = 15;
       ctx.beginPath();
-      ctx.arc(p.pos.x, p.pos.y, 2, 0, Math.PI * 2);
+      ctx.arc(p.pos.x, p.pos.y, radius, 0, Math.PI * 2);
       ctx.fill();
+      ctx.restore();
     });
-    ctx.globalAlpha = 1.0;
 
-    drawShip(ctx, 'player', undefined, state.player.pos.x, state.player.pos.y, state.player.size.x, state.player.size.y, state.activePlaneId);
+    drawShip(ctx, 'player', undefined, state.player.pos.x, state.player.pos.y, state.player.size.x, state.player.size.y, state.activePlaneId, time);
     state.enemies.forEach(e => {
-      drawShip(ctx, 'enemy', e.subType, e.pos.x, e.pos.y, e.size.x, e.size.y);
+      drawShip(ctx, 'enemy', e.subType, e.pos.x, e.pos.y, e.size.x, e.size.y, undefined, time);
       if (e.subType === 'elite' || e.subType === 'super') {
         ctx.fillStyle = '#451a03';
         ctx.fillRect(e.pos.x, e.pos.y - 12, e.size.x, 3);
@@ -231,16 +276,7 @@ const App: React.FC = () => {
       }
     });
 
-    state.bullets.forEach(b => {
-      ctx.fillStyle = b.color;
-      ctx.beginPath();
-      ctx.arc(b.pos.x, b.pos.y, BULLET_RADIUS, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.shadowBlur = 8;
-      ctx.shadowColor = b.color;
-      ctx.stroke();
-      ctx.shadowBlur = 0;
-    });
+    state.bullets.forEach(b => drawProjectile(ctx, b));
   }, []);
 
   const update = useCallback((time: number) => {
@@ -252,6 +288,8 @@ const App: React.FC = () => {
       lastTickRef,
       defaultPlane,
       draw,
+      touchTargetRef,
+      autoFire: isTouchDevice,
       setScore,
       setLevel,
       setEnergy,
@@ -259,7 +297,7 @@ const App: React.FC = () => {
       setStatus
     });
     if (shouldContinue) requestRef.current = requestAnimationFrame(update);
-  }, [status, keys, defaultPlane, draw]);
+  }, [status, keys, defaultPlane, draw, isTouchDevice]);
 
   useEffect(() => {
     const kd = (e: KeyboardEvent) => {
@@ -274,6 +312,7 @@ const App: React.FC = () => {
         attemptSwitchToSlot(Number(e.key) - 1);
         return;
       }
+      if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', ' '].includes(e.key)) e.preventDefault();
       setKeys(p => ({ ...p, [e.key]: true }));
     };
     const ku = (e: KeyboardEvent) => setKeys(p => ({ ...p, [e.key]: false }));
@@ -296,16 +335,61 @@ const App: React.FC = () => {
 
   const hpScale = getDifficultyMults(difficulty).playerHp / 100;
 
+  const updateTouchTarget = (event: React.PointerEvent<HTMLCanvasElement>) => {
+    const bounds = event.currentTarget.getBoundingClientRect();
+    touchTargetRef.current = {
+      x: (event.clientX - bounds.left) * CANVAS_WIDTH / bounds.width,
+      y: (event.clientY - bounds.top) * CANVAS_HEIGHT / bounds.height
+    };
+  };
+
+  const handlePointerDown = (event: React.PointerEvent<HTMLCanvasElement>) => {
+    if (status !== GameStatus.PLAYING || event.pointerType === 'mouse') return;
+    activePointerRef.current = event.pointerId;
+    event.currentTarget.setPointerCapture(event.pointerId);
+    updateTouchTarget(event);
+  };
+
+  const handlePointerMove = (event: React.PointerEvent<HTMLCanvasElement>) => {
+    if (activePointerRef.current === event.pointerId) updateTouchTarget(event);
+  };
+
+  const handlePointerEnd = (event: React.PointerEvent<HTMLCanvasElement>) => {
+    if (activePointerRef.current === event.pointerId) {
+      activePointerRef.current = null;
+      touchTargetRef.current = null;
+    }
+  };
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-slate-950 text-slate-100 font-orbitron">
-      <HudBar score={score} level={level} health={health} maxHealth={maxHealth} energy={energy} difficulty={difficulty} t={t} />
-
-      {status === GameStatus.PLAYING && (
-        <PlaneSwitchBar selectedPlanes={selectedPlanes} activePlaneId={activePlaneId} energy={energy} onSwitch={switchToPlane} t={t} />
-      )}
-
-      <div className="relative">
-        <canvas ref={canvasRef} width={CANVAS_WIDTH} height={CANVAS_HEIGHT} className="rounded-xl border-2 border-slate-800 shadow-2xl" />
+    <div className="app-shell">
+      <div className="ambient ambient-one" />
+      <div className="ambient ambient-two" />
+      <header className="site-header">
+        <div className="brand-lockup"><span className="brand-mark">✦</span><span>{t.title}</span></div>
+        <div className="header-meta"><span>ORBITAL DEFENSE COMMAND</span><span className="signal-dot" /> SYSTEM ONLINE</div>
+      </header>
+      <main className="game-layout">
+        <section className="command-panel">
+          <div className="eyebrow">MISSION CONTROL / 001</div>
+          <h2>{t.title}</h2>
+          <p>{t.subtitle}</p>
+          <div className="command-divider" />
+          <div className="selected-unit">
+            <span className="eyebrow">{t.hangarTitle} / ACTIVE UNIT</span>
+            <img src={shipAssets[activePlaneId]} alt="" />
+            <strong>{t.planeNames[activePlaneId]}</strong>
+            <small>{t.planeRoles[activePlaneId]}</small>
+          </div>
+          <div className="command-foot">SECTOR 07 <span>●</span> LIVE FEED</div>
+        </section>
+        <section className={'play-column' + (status === GameStatus.PLAYING ? ' is-playing' : '')}>
+          <HudBar score={score} level={level} health={health} maxHealth={maxHealth} energy={energy} difficulty={difficulty} t={t} />
+          {status === GameStatus.PLAYING && (
+            <PlaneSwitchBar selectedPlanes={selectedPlanes} activePlaneId={activePlaneId} energy={energy} onSwitch={switchToPlane} t={t} />
+          )}
+          <div className="game-stage">
+        <canvas ref={canvasRef} width={CANVAS_WIDTH} height={CANVAS_HEIGHT} onPointerDown={handlePointerDown} onPointerMove={handlePointerMove} onPointerUp={handlePointerEnd} onPointerCancel={handlePointerEnd} />
 
         {status === GameStatus.START && (
           <StartOverlay
@@ -345,7 +429,20 @@ const App: React.FC = () => {
 
         {status === GameStatus.GAMEOVER && <GameOverOverlay t={t} score={score} onRedeploy={initGame} onBackHome={returnToHome} />}
         {status === GameStatus.PAUSED && <PauseOverlay t={t} onResume={() => setStatus(GameStatus.PLAYING)} onBackHome={returnToHome} />}
-      </div>
+        {status === GameStatus.PLAYING && <button className="stage-pause" onClick={() => { touchTargetRef.current = null; setStatus(GameStatus.PAUSED); }} aria-label={t.pauseTitle}>Ⅱ</button>}
+          </div>
+          <div className="controls-hint">{isTouchDevice ? controlHints[language].touch : controlHints[language].keyboard}</div>
+        </section>
+        <aside className="status-panel">
+          <div className="eyebrow">TACTICAL STATUS</div>
+          <div className="status-number">{String(level).padStart(2, '0')}<small>LEVEL</small></div>
+          <div className="status-line"><span>{t.score}</span><strong>{score.toString().padStart(6, '0')}</strong></div>
+          <div className="status-line"><span>{t.integrity}</span><strong>{Math.ceil(health)} / {maxHealth}</strong></div>
+          <div className="status-line"><span>{t.energy}</span><strong>{energy} / {ENERGY_MAX}</strong></div>
+          <div className="radar"><div className="radar-sweep" /><span>◆</span></div>
+          <div className="eyebrow">THREAT DETECTION ACTIVE</div>
+        </aside>
+      </main>
     </div>
   );
 };
