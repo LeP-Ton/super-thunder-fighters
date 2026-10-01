@@ -15,16 +15,16 @@ export const BULLET_RADIUS = 4;
 export const PARTICLE_COUNT = 15;
 
 export const COLORS = {
-  PLAYER: '#38bdf8', // Sky 400
-  PLAYER_FLAME: '#7dd3fc', // Sky 300
-  PLAYER_BULLET: '#0ea5e9', // Sky 500
+  PLAYER: '#4ce7ff',
+  PLAYER_FLAME: '#56dfff',
+  PLAYER_BULLET: '#43ddff',
   
-  ENEMY_GRUNT: '#2dd4bf', // Teal 400 (Low)
-  ENEMY_KAMIKAZE: '#fb923c', // Orange 400 (Fast)
-  ENEMY_ELITE: '#a78bfa', // Purple 400 (Mid)
-  ENEMY_SUPER: '#f43f5e', // Rose 500 (Extreme)
+  ENEMY_GRUNT: '#bdff44',
+  ENEMY_KAMIKAZE: '#ff6b36',
+  ENEMY_ELITE: '#e64dff',
+  ENEMY_SUPER: '#ff3898',
   
-  ENEMY_BULLET: '#f43f5e',
-  BG_ACCENT: '#1e293b',
-  ACCENT: '#fbbf24',
+  ENEMY_BULLET: '#ff3898',
+  BG_ACCENT: '#241044',
+  ACCENT: '#cbf64b',
 };

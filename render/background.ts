@@ -1,60 +1,67 @@
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from '../constants';
 
-const stars = Array.from({ length: 86 }, (_, index) => ({
-  x: (index * 173.71) % CANVAS_WIDTH,
-  y: (index * 311.39) % CANVAS_HEIGHT,
-  size: index % 9 === 0 ? 1.8 : index % 3 === 0 ? 1.15 : 0.7,
-  speed: index % 5 === 0 ? 0.12 : 0.055,
-  alpha: index % 7 === 0 ? 0.9 : 0.38
+const stars = Array.from({ length: 105 }, (_, index) => ({
+  x: (index * 193.37 + 17) % CANVAS_WIDTH,
+  y: (index * 311.91 + 29) % CANVAS_HEIGHT,
+  speed: 0.035 + (index % 7) * 0.028,
+  length: index % 13 === 0 ? 17 : index % 4 === 0 ? 8 : 3,
+  alpha: index % 5 === 0 ? 0.85 : 0.3
 }));
 
 export const drawBackground = (ctx: CanvasRenderingContext2D, time: number) => {
   const base = ctx.createLinearGradient(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-  base.addColorStop(0, '#020b16');
-  base.addColorStop(0.55, '#081626');
-  base.addColorStop(1, '#020710');
+  base.addColorStop(0, '#09081c');
+  base.addColorStop(0.5, '#10072b');
+  base.addColorStop(1, '#050914');
   ctx.fillStyle = base;
   ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-  const nebula = ctx.createRadialGradient(465, 180, 10, 465, 180, 390);
-  nebula.addColorStop(0, 'rgba(21, 94, 121, .26)');
-  nebula.addColorStop(1, 'rgba(21, 94, 121, 0)');
-  ctx.fillStyle = nebula;
+  const glow = ctx.createRadialGradient(300, 340, 30, 300, 340, 480);
+  glow.addColorStop(0, 'rgba(109, 26, 170, .22)');
+  glow.addColorStop(0.55, 'rgba(20, 81, 161, .11)');
+  glow.addColorStop(1, 'rgba(9, 8, 28, 0)');
+  ctx.fillStyle = glow;
   ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
+  // 透视跑道给纵向卷轴提供速度感，不干扰原有碰撞区域。
+  const travel = (time * 0.11) % 100;
   ctx.save();
-  ctx.strokeStyle = 'rgba(92, 161, 181, .08)';
   ctx.lineWidth = 1;
-  const travel = (time * 0.025) % 80;
-  for (let y = travel; y < CANVAS_HEIGHT; y += 80) {
+  for (let y = -100 + travel; y < CANVAS_HEIGHT + 100; y += 100) {
+    const perspective = 0.3 + Math.max(0, y) / CANVAS_HEIGHT * 0.8;
+    ctx.strokeStyle = `rgba(55, 235, 255, ${0.05 + perspective * 0.07})`;
     ctx.beginPath();
-    ctx.moveTo(0, y);
-    ctx.lineTo(CANVAS_WIDTH, y);
+    ctx.moveTo(300 - 255 * perspective, y);
+    ctx.lineTo(300 + 255 * perspective, y);
     ctx.stroke();
   }
-  for (let x = 0; x <= CANVAS_WIDTH; x += 75) {
-    ctx.beginPath();
-    ctx.moveTo(x, 0);
-    ctx.lineTo(x, CANVAS_HEIGHT);
-    ctx.stroke();
+  for (const side of [-1, 1]) {
+    for (let lane = 1; lane <= 3; lane++) {
+      ctx.strokeStyle = lane === 3 ? 'rgba(255, 58, 191, .17)' : 'rgba(52, 203, 255, .09)';
+      ctx.beginPath();
+      ctx.moveTo(300 + side * lane * 19, 0);
+      ctx.lineTo(300 + side * lane * 82, CANVAS_HEIGHT);
+      ctx.stroke();
+    }
   }
   ctx.restore();
 
   for (const star of stars) {
     const y = (star.y + time * star.speed) % CANVAS_HEIGHT;
-    ctx.fillStyle = `rgba(201, 232, 244, ${star.alpha})`;
-    ctx.fillRect(star.x, y, star.size, star.size * 2);
+    ctx.fillStyle = `rgba(165, 229, 255, ${star.alpha})`;
+    ctx.fillRect(star.x, y, star.length > 10 ? 2 : 1, star.length);
   }
 
-  ctx.strokeStyle = 'rgba(61, 191, 224, .22)';
+  ctx.save();
   ctx.lineWidth = 2;
-  ctx.strokeRect(11, 11, CANVAS_WIDTH - 22, CANVAS_HEIGHT - 22);
-  ctx.fillStyle = 'rgba(61, 191, 224, .3)';
-  for (const [x, y, dx, dy] of [
-    [11, 11, 1, 1], [CANVAS_WIDTH - 11, 11, -1, 1],
-    [11, CANVAS_HEIGHT - 11, 1, -1], [CANVAS_WIDTH - 11, CANVAS_HEIGHT - 11, -1, -1]
-  ]) {
-    ctx.fillRect(x, y, 22 * dx, 3 * dy);
-    ctx.fillRect(x, y, 3 * dx, 22 * dy);
-  }
+  ctx.strokeStyle = 'rgba(82, 236, 255, .35)';
+  ctx.shadowColor = '#35dcff';
+  ctx.shadowBlur = 14;
+  ctx.beginPath();
+  ctx.moveTo(13, 77); ctx.lineTo(13, 13); ctx.lineTo(75, 13);
+  ctx.moveTo(CANVAS_WIDTH - 75, 13); ctx.lineTo(CANVAS_WIDTH - 13, 13); ctx.lineTo(CANVAS_WIDTH - 13, 77);
+  ctx.moveTo(13, CANVAS_HEIGHT - 77); ctx.lineTo(13, CANVAS_HEIGHT - 13); ctx.lineTo(75, CANVAS_HEIGHT - 13);
+  ctx.moveTo(CANVAS_WIDTH - 75, CANVAS_HEIGHT - 13); ctx.lineTo(CANVAS_WIDTH - 13, CANVAS_HEIGHT - 13); ctx.lineTo(CANVAS_WIDTH - 13, CANVAS_HEIGHT - 77);
+  ctx.stroke();
+  ctx.restore();
 };

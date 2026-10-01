@@ -23,12 +23,12 @@ const projectileAssets: Record<ProjectileVisual, string> = {
 };
 
 const playerProjectileColors: Record<PlaneId, string> = {
-  vanguard: '#63d9ff',
-  strider: '#a9f4ff',
-  tempest: '#52f4dc',
-  aegis: '#f5c47b',
-  nova: '#ffab60',
-  specter: '#bb9cff'
+  vanguard: '#52e9ff',
+  strider: '#bdff48',
+  tempest: '#3dffc4',
+  aegis: '#ffe54f',
+  nova: '#ff8355',
+  specter: '#f15cff'
 };
 
 export const getPlayerProjectileColor = (planeId: PlaneId) => playerProjectileColors[planeId];
@@ -48,28 +48,36 @@ const getImage = (source: string) => {
 export const getUnitColor = (type: 'player' | 'enemy', subType?: EnemySubType) => {
   if (type === 'player') return { main: COLORS.PLAYER, flame: COLORS.PLAYER_FLAME, bullet: COLORS.PLAYER_BULLET };
   switch (subType) {
-    case 'kamikaze': return { main: COLORS.ENEMY_KAMIKAZE, flame: '#ffb36b', bullet: COLORS.ENEMY_KAMIKAZE };
-    case 'elite': return { main: COLORS.ENEMY_ELITE, flame: '#c5b5ff', bullet: COLORS.ENEMY_ELITE };
-    case 'super': return { main: COLORS.ENEMY_SUPER, flame: '#ff98aa', bullet: COLORS.ENEMY_SUPER };
-    default: return { main: COLORS.ENEMY_GRUNT, flame: '#80f4de', bullet: COLORS.ENEMY_GRUNT };
+    case 'kamikaze': return { main: COLORS.ENEMY_KAMIKAZE, flame: '#ff983d', bullet: COLORS.ENEMY_KAMIKAZE };
+    case 'elite': return { main: COLORS.ENEMY_ELITE, flame: '#f269ff', bullet: COLORS.ENEMY_ELITE };
+    case 'super': return { main: COLORS.ENEMY_SUPER, flame: '#ff56c2', bullet: COLORS.ENEMY_SUPER };
+    default: return { main: COLORS.ENEMY_GRUNT, flame: '#c3ff4e', bullet: COLORS.ENEMY_GRUNT };
   }
 };
 
 const drawExhaust = (ctx: CanvasRenderingContext2D, x: number, y: number, radius: number, color: string, reverse: boolean, time: number) => {
-  const pulse = 0.82 + Math.sin(time / 72 + x) * 0.18;
-  const endY = y + (reverse ? -1 : 1) * radius * 2.7 * pulse;
+  const pulse = 0.82 + Math.sin(time / 62 + x) * 0.18;
+  const endY = y + (reverse ? -1 : 1) * radius * 3.6 * pulse;
   const flame = ctx.createLinearGradient(x, y, x, endY);
   flame.addColorStop(0, '#fff');
-  flame.addColorStop(0.18, color);
+  flame.addColorStop(0.12, color);
+  flame.addColorStop(0.48, color);
   flame.addColorStop(1, 'transparent');
   ctx.save();
   ctx.globalCompositeOperation = 'screen';
   ctx.shadowColor = color;
-  ctx.shadowBlur = radius * 2.2;
+  ctx.shadowBlur = radius * 2.9;
   ctx.fillStyle = flame;
   ctx.beginPath();
   ctx.moveTo(x - radius * 0.46, y);
   ctx.quadraticCurveTo(x, endY, x + radius * 0.46, y);
+  ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.globalAlpha = 0.78;
+  ctx.beginPath();
+  ctx.moveTo(x - radius * 0.2, y);
+  ctx.lineTo(x, endY * 0.58 + y * 0.42);
+  ctx.lineTo(x + radius * 0.2, y);
   ctx.fill();
   ctx.restore();
 };
@@ -98,8 +106,12 @@ export const drawShip = (
   if (image) {
     ctx.save();
     ctx.shadowColor = colors.main;
-    ctx.shadowBlur = type === 'player' ? 11 : 7;
-    ctx.drawImage(image, x, y, w, h);
+    ctx.shadowBlur = type === 'player' ? 17 : 12;
+    const imageRatio = image.naturalWidth / image.naturalHeight;
+    const boxRatio = w / h;
+    const drawWidth = imageRatio < boxRatio ? h * imageRatio : w;
+    const drawHeight = imageRatio < boxRatio ? h : w / imageRatio;
+    ctx.drawImage(image, x + (w - drawWidth) / 2, y + (h - drawHeight) / 2, drawWidth, drawHeight);
     ctx.restore();
   } else {
     // 图片尚未解码时，保留可辨认的战机轮廓。
@@ -117,30 +129,34 @@ export const drawProjectile = (ctx: CanvasRenderingContext2D, bullet: Bullet) =>
   const kind: ProjectileVisual = bullet.visual ?? (bullet.owner === 'enemy' ? 'enemy' : 'plasma');
   const image = getImage(projectileAssets[kind]);
   const isMissile = kind === 'missile';
-  const width = isMissile ? 19 : kind === 'enemy' ? 13 : bullet.damage >= 1.5 ? 17 : 15;
-  const height = isMissile ? 31 : bullet.pierce ? 34 : bullet.damage < 0.7 ? 22 : 26;
+  const width = isMissile ? 22 : kind === 'enemy' ? 16 : bullet.damage >= 1.5 ? 18 : 15;
+  const height = isMissile ? 34 : bullet.pierce ? 36 : bullet.damage < 0.7 ? 24 : 28;
   const { x, y } = bullet.pos;
-  const tail = bullet.owner === 'enemy' ? -17 : 17;
+  const tail = bullet.owner === 'enemy' ? -25 : 25;
 
   ctx.save();
   ctx.globalCompositeOperation = 'screen';
   ctx.strokeStyle = bullet.color;
-  ctx.globalAlpha = 0.58;
-  ctx.lineWidth = isMissile ? 3 : 5;
+  ctx.globalAlpha = 0.78;
+  ctx.lineWidth = isMissile ? 4 : 6;
   ctx.shadowColor = bullet.color;
-  ctx.shadowBlur = 14;
+  ctx.shadowBlur = 20;
   ctx.beginPath();
   ctx.moveTo(x, y);
   ctx.lineTo(x - bullet.velocity.x * 2.5, y + tail);
+  ctx.stroke();
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 1.5;
+  ctx.globalAlpha = 0.7;
   ctx.stroke();
   ctx.restore();
 
   ctx.save();
   ctx.globalCompositeOperation = 'screen';
   ctx.fillStyle = bullet.color;
-  ctx.globalAlpha = 0.25;
+  ctx.globalAlpha = 0.38;
   ctx.shadowColor = bullet.color;
-  ctx.shadowBlur = 16;
+  ctx.shadowBlur = 23;
   ctx.beginPath();
   ctx.ellipse(x, y, width * 0.35, height * 0.4, 0, 0, Math.PI * 2);
   ctx.fill();
@@ -149,7 +165,7 @@ export const drawProjectile = (ctx: CanvasRenderingContext2D, bullet: Bullet) =>
   if (image) {
     ctx.save();
     ctx.shadowColor = bullet.color;
-    ctx.shadowBlur = 8;
+    ctx.shadowBlur = 13;
     ctx.drawImage(image, x - width / 2, y - height / 2, width, height);
     ctx.restore();
   } else {

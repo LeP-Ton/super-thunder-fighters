@@ -18,7 +18,7 @@ interface HangarModalProps {
 export const HangarModal: React.FC<HangarModalProps> = ({ t, planes, selectedPlanes, status, hpScale, canStart, onTogglePlane, onClose }) => (
   <div className="screen-overlay modal-overlay">
     <div className="modal-panel wide-modal">
-      <div className="modal-header"><div><span className="eyebrow">FLIGHT SYSTEM / HANGAR</span><h2>{t.hangarTitle}</h2></div><button className="icon-button" onClick={onClose} aria-label={t.backHome}><X size={20} /></button></div>
+      <div className="modal-header"><div><span className="eyebrow">FIGHTER SELECT / PLAYER ONE</span><h2>{t.hangarTitle}</h2></div><button className="icon-button" onClick={onClose} aria-label={t.backHome}><X size={20} /></button></div>
       <div className="modal-intro"><p>{t.hangarHint}</p><strong className={canStart ? 'ready-text' : ''}>{t.hangarCount.replace('{count}', String(selectedPlanes.length))}</strong></div>
       <div className="modal-scroll"><div className="plane-grid">
         {planes.map((plane) => {
@@ -30,7 +30,7 @@ export const HangarModal: React.FC<HangarModalProps> = ({ t, planes, selectedPla
           </button>;
         })}
       </div></div>
-      <div className="modal-footer"><span>SELECT 03 AIRCRAFT / DEPLOY</span><button className="secondary-button" onClick={onClose}>{t.backHome}</button></div>
+      <div className="modal-footer"><span>SELECT 03 FIGHTERS / START</span><button className="secondary-button" onClick={onClose}>{t.backHome}</button></div>
     </div>
   </div>
 );

@@ -18,8 +18,6 @@ import { HangarModal } from './components/HangarModal';
 import { SettingsModal } from './components/SettingsModal';
 import { GameOverOverlay, PauseOverlay } from './components/Overlays';
 
-// --- Main App Component ---
-
 const controlHints: Record<Language, { touch: string; keyboard: string }> = {
   zh: { touch: '拖动战机 · 自动开火 · 点击战机切换', keyboard: 'WASD / 方向键移动 · 空格 / Enter 开火 · 1–3 切换 · Esc 暂停' },
   en: { touch: 'Drag to move · Auto fire · Tap a fighter to switch', keyboard: 'WASD / Arrows to move · Space / Enter to fire · 1–3 to switch · Esc to pause' },
@@ -253,15 +251,24 @@ const App: React.FC = () => {
     ctx.setTransform(pixelRatioRef.current, 0, 0, pixelRatioRef.current, 0, 0);
     drawBackground(ctx, time);
     state.particles.forEach(p => {
-      const radius = 2 + (1 - p.life) * 5;
+      const radius = 2 + (1 - p.life) * 7;
       ctx.save();
       ctx.globalAlpha = Math.max(0, p.life);
       ctx.fillStyle = p.color;
       ctx.shadowColor = p.color;
-      ctx.shadowBlur = 15;
+      ctx.shadowBlur = 22;
+      ctx.translate(p.pos.x, p.pos.y);
+      ctx.rotate((1 - p.life) * 3.4);
       ctx.beginPath();
-      ctx.arc(p.pos.x, p.pos.y, radius, 0, Math.PI * 2);
+      ctx.moveTo(0, -radius * 1.8);
+      ctx.lineTo(radius * 0.38, 0);
+      ctx.lineTo(0, radius * 1.8);
+      ctx.lineTo(-radius * 0.38, 0);
+      ctx.closePath();
       ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.globalAlpha *= 0.65;
+      ctx.fillRect(-1, -radius, 2, radius * 2);
       ctx.restore();
     });
 
@@ -269,10 +276,13 @@ const App: React.FC = () => {
     state.enemies.forEach(e => {
       drawShip(ctx, 'enemy', e.subType, e.pos.x, e.pos.y, e.size.x, e.size.y, undefined, time);
       if (e.subType === 'elite' || e.subType === 'super') {
-        ctx.fillStyle = '#451a03';
-        ctx.fillRect(e.pos.x, e.pos.y - 12, e.size.x, 3);
-        ctx.fillStyle = '#22c55e';
-        ctx.fillRect(e.pos.x, e.pos.y - 12, e.size.x * (e.health / e.maxHealth), 3);
+        ctx.fillStyle = '#2b103e';
+        ctx.fillRect(e.pos.x, e.pos.y - 13, e.size.x, 4);
+        ctx.fillStyle = '#f44aca';
+        ctx.shadowColor = '#f44aca';
+        ctx.shadowBlur = 9;
+        ctx.fillRect(e.pos.x, e.pos.y - 13, e.size.x * (e.health / e.maxHealth), 4);
+        ctx.shadowBlur = 0;
       }
     });
 
@@ -367,21 +377,21 @@ const App: React.FC = () => {
       <div className="ambient ambient-two" />
       <header className="site-header">
         <div className="brand-lockup"><span className="brand-mark">✦</span><span>{t.title}</span></div>
-        <div className="header-meta"><span>ORBITAL DEFENSE COMMAND</span><span className="signal-dot" /> SYSTEM ONLINE</div>
+        <div className="header-meta"><span>NEON ARCADE / 01</span><span className="signal-dot" /> INSERT COIN · GO LIVE</div>
       </header>
       <main className="game-layout">
         <section className="command-panel">
-          <div className="eyebrow">MISSION CONTROL / 001</div>
+          <div className="eyebrow">PLAYER ONE / READY</div>
           <h2>{t.title}</h2>
           <p>{t.subtitle}</p>
           <div className="command-divider" />
           <div className="selected-unit">
-            <span className="eyebrow">{t.hangarTitle} / ACTIVE UNIT</span>
+            <span className="eyebrow">{t.hangarTitle} / SELECT FIGHTER</span>
             <img src={shipAssets[activePlaneId]} alt="" />
             <strong>{t.planeNames[activePlaneId]}</strong>
             <small>{t.planeRoles[activePlaneId]}</small>
           </div>
-          <div className="command-foot">SECTOR 07 <span>●</span> LIVE FEED</div>
+          <div className="command-foot">STAGE 01 <span>●</span> HIGH SCORE</div>
         </section>
         <section className={'play-column' + (status === GameStatus.PLAYING ? ' is-playing' : '')}>
           <HudBar score={score} level={level} health={health} maxHealth={maxHealth} energy={energy} difficulty={difficulty} t={t} />
@@ -434,13 +444,13 @@ const App: React.FC = () => {
           <div className="controls-hint">{isTouchDevice ? controlHints[language].touch : controlHints[language].keyboard}</div>
         </section>
         <aside className="status-panel">
-          <div className="eyebrow">TACTICAL STATUS</div>
+          <div className="eyebrow">ARCADE STATUS / LIVE</div>
           <div className="status-number">{String(level).padStart(2, '0')}<small>LEVEL</small></div>
           <div className="status-line"><span>{t.score}</span><strong>{score.toString().padStart(6, '0')}</strong></div>
           <div className="status-line"><span>{t.integrity}</span><strong>{Math.ceil(health)} / {maxHealth}</strong></div>
           <div className="status-line"><span>{t.energy}</span><strong>{energy} / {ENERGY_MAX}</strong></div>
           <div className="radar"><div className="radar-sweep" /><span>◆</span></div>
-          <div className="eyebrow">THREAT DETECTION ACTIVE</div>
+          <div className="eyebrow">COMBO READY · FULL THROTTLE</div>
         </aside>
       </main>
     </div>

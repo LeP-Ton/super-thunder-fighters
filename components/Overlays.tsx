@@ -11,7 +11,7 @@ interface GameOverOverlayProps {
 
 export const GameOverOverlay: React.FC<GameOverOverlayProps> = ({ t, score, onRedeploy, onBackHome }) => (
   <div className="screen-overlay result-overlay">
-    <div className="eyebrow danger">SIGNAL LOST / MISSION TERMINATED</div>
+    <div className="eyebrow danger">GAME OVER / TRY AGAIN</div>
     <div className="result-emblem">✕</div>
     <h2>{t.missionFailed}</h2>
     <p>{t.failedDesc}</p>
@@ -29,7 +29,7 @@ interface PauseOverlayProps {
 
 export const PauseOverlay: React.FC<PauseOverlayProps> = ({ t, onResume, onBackHome }) => (
   <div className="screen-overlay result-overlay pause-overlay">
-    <div className="eyebrow">COMBAT SYSTEM / STANDBY</div>
+    <div className="eyebrow">GAME PAUSED / PLAYER ONE</div>
     <div className="result-emblem pause-emblem">Ⅱ</div>
     <h2>{t.pauseTitle}</h2>
     <p>{t.subtitle}</p>

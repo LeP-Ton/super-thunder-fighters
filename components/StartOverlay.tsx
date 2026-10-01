@@ -16,19 +16,19 @@ interface StartOverlayProps {
 
 export const StartOverlay: React.FC<StartOverlayProps> = ({ t, briefing, canStart, onStart, onShowIntel, onShowHangar, onShowSettings }) => (
   <div className="screen-overlay start-overlay">
-    <div className="start-topline"><span>STF // ORBITAL DEFENSE</span><span>TACTICAL SYSTEM 01</span></div>
+    <div className="start-topline"><span>SUPER THUNDER // ARCADE</span><span>PLAYER ONE / STAGE 01</span></div>
     <div className="start-hero">
       <div className="hero-aura" />
       <img src={shipAssets.vanguard} alt="" />
       <div className="hero-label">VANGUARD / 001</div>
     </div>
     <div className="start-content">
-      <div className="eyebrow"><span className="live-indicator" /> COMMAND LINK ESTABLISHED</div>
+      <div className="eyebrow"><span className="live-indicator" /> READY TO FIGHT</div>
       <h1>{t.title}</h1>
       <p>{t.subtitle}</p>
       <div className="briefing-card">
         <div className="briefing-heading"><span>{t.briefingTitle}</span><ArrowUpRight size={15} /></div>
-        <strong>{briefing?.title ?? 'MISSION BRIEFING'}</strong>
+        <strong>{briefing?.title ?? 'NEXT STAGE'}</strong>
         <p>{briefing?.tacticalAdvice ?? t.combatAdviceLabel}</p>
       </div>
       <button className="primary-button" onClick={onStart} disabled={!canStart}><Play size={18} fill="currentColor" />{t.initiate}<ArrowUpRight size={18} /></button>
