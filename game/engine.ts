@@ -3,6 +3,7 @@ import { CANVAS_WIDTH, CANVAS_HEIGHT, ENEMY_SIZE, ENEMY_BASE_SPEED, ENEMY_FIRE_R
 import { ENERGY_MAX, PLANE_BY_ID } from '../planes';
 import { getPlayerProjectileColor, getUnitColor } from '../render/ships';
 import { getDifficultyMults } from './difficulty';
+import { FIXED_STEP_MS } from './fixedStep';
 import { applyKillEffects, getPlaneMoveSpeed, tryFirePlayer, updatePlaneHeat } from './planeBehaviors';
 
 export type Ref<T> = { current: T };
@@ -12,9 +13,7 @@ interface UpdateParams {
   status: GameStatus;
   keys: Record<string, boolean>;
   gameStateRef: Ref<GameState>;
-  lastTickRef: Ref<number>;
   defaultPlane: PlaneDef;
-  draw: () => void;
   touchTargetRef: Ref<Vector2 | null>;
   autoFire: boolean;
   setScore: (value: number) => void;
@@ -84,9 +83,7 @@ export const updateGame = ({
   status,
   keys,
   gameStateRef,
-  lastTickRef,
   defaultPlane,
-  draw,
   touchTargetRef,
   autoFire,
   setScore,
@@ -110,9 +107,7 @@ export const updateGame = ({
     player.pos.y = cy - activePlane.size / 2;
   }
 
-  const prevTime = lastTickRef.current || time;
-  const dt = Math.min(0.05, (time - prevTime) / 1000);
-  lastTickRef.current = time;
+  const dt = FIXED_STEP_MS / 1000;
 
   const activePlaneState = state.planeStates[state.activePlaneId];
   // Aegis/Specter trait: modifies incoming damage taken.
@@ -294,6 +289,5 @@ export const updateGame = ({
     if (p.life <= 0) particles.splice(idx, 1);
   });
 
-  draw();
-  return true;
+  return player.health > 0;
 };
