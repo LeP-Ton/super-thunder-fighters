@@ -8,6 +8,7 @@ import { translations, Language } from './i18n';
 import { drawProjectile, drawShip, shipAssets } from './render/ships';
 import { drawBackground } from './render/background';
 import { updateGame } from './game/engine';
+import { advanceFixedClock, createFixedClock } from './game/fixedStep';
 import { buildPlaneStates } from './game/state';
 import { getDifficultyMults } from './game/difficulty';
 import { HudBar } from './components/HudBar';
@@ -41,7 +42,7 @@ const App: React.FC = () => {
   const [health, setHealth] = useState(defaultPlane.maxHealth);
   const [maxHealth, setMaxHealth] = useState(defaultPlane.maxHealth);
   const [briefing, setBriefing] = useState<Briefing | null>(null);
-  const [keys, setKeys] = useState<Record<string, boolean>>({});
+  const keysRef = useRef<Record<string, boolean>>({});
   const [showIntel, setShowIntel] = useState(false);
   const [showHangar, setShowHangar] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -81,7 +82,7 @@ const App: React.FC = () => {
   });
 
   const requestRef = useRef<number>();
-  const lastTickRef = useRef<number>(0);
+  const clockRef = useRef(createFixedClock());
 
   useEffect(() => {
     const query = window.matchMedia('(pointer: coarse)');
@@ -106,6 +107,7 @@ const App: React.FC = () => {
   }, []);
 
   const returnToHome = () => {
+    keysRef.current = {};
     touchTargetRef.current = null;
     activePointerRef.current = null;
     const loadout = selectedPlanes.length === 3 ? selectedPlanes : DEFAULT_LOADOUT;
@@ -151,6 +153,7 @@ const App: React.FC = () => {
 
   const initGame = () => {
     if (selectedPlanes.length !== 3) return;
+    keysRef.current = {};
     touchTargetRef.current = null;
     activePointerRef.current = null;
     const planeStates = buildPlaneStates(difficulty);
@@ -280,30 +283,31 @@ const App: React.FC = () => {
   }, []);
 
   const update = useCallback((time: number) => {
-    const shouldContinue = updateGame({
-      time,
-      status,
-      keys,
-      gameStateRef,
-      lastTickRef,
-      defaultPlane,
-      draw,
-      touchTargetRef,
-      autoFire: isTouchDevice,
-      setScore,
-      setLevel,
-      setEnergy,
-      setHealth,
-      setStatus
+    const { updated, shouldContinue } = advanceFixedClock(clockRef.current, time, (stepTime) => {
+      return updateGame({
+        time: stepTime,
+        status,
+        keys: keysRef.current,
+        gameStateRef,
+        defaultPlane,
+        touchTargetRef,
+        autoFire: isTouchDevice,
+        setScore,
+        setLevel,
+        setEnergy,
+        setHealth,
+        setStatus
+      });
     });
+    if (updated) draw();
     if (shouldContinue) requestRef.current = requestAnimationFrame(update);
-  }, [status, keys, defaultPlane, draw, isTouchDevice]);
+  }, [status, defaultPlane, draw, isTouchDevice]);
 
   useEffect(() => {
     const kd = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         e.preventDefault();
-        setKeys({});
+        keysRef.current = {};
         setStatus(prev => (prev === GameStatus.PLAYING ? GameStatus.PAUSED : prev === GameStatus.PAUSED ? GameStatus.PLAYING : prev));
         return;
       }
@@ -313,11 +317,23 @@ const App: React.FC = () => {
         return;
       }
       if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', ' '].includes(e.key)) e.preventDefault();
-      setKeys(p => ({ ...p, [e.key]: true }));
+      keysRef.current[e.key] = true;
     };
-    const ku = (e: KeyboardEvent) => setKeys(p => ({ ...p, [e.key]: false }));
+    const ku = (e: KeyboardEvent) => { keysRef.current[e.key] = false; };
+    const clearInput = () => {
+      keysRef.current = {};
+      clockRef.current = createFixedClock();
+    };
+    const handleVisibilityChange = () => { clearInput(); };
     window.addEventListener('keydown', kd); window.addEventListener('keyup', ku);
-    return () => { window.removeEventListener('keydown', kd); window.removeEventListener('keyup', ku); };
+    window.addEventListener('blur', clearInput);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      window.removeEventListener('keydown', kd);
+      window.removeEventListener('keyup', ku);
+      window.removeEventListener('blur', clearInput);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [attemptSwitchToSlot, status]);
 
   useEffect(() => {
@@ -327,7 +343,12 @@ const App: React.FC = () => {
     }
   }, [activePlaneId, selectedPlanes]);
 
-  useEffect(() => { requestRef.current = requestAnimationFrame(update); return () => cancelAnimationFrame(requestRef.current!); }, [update]);
+  useEffect(() => {
+    clockRef.current = createFixedClock();
+    if (status !== GameStatus.PLAYING) return;
+    requestRef.current = requestAnimationFrame(update);
+    return () => cancelAnimationFrame(requestRef.current!);
+  }, [status, update]);
 
   useEffect(() => {
     getPilotBriefing(level, score, language).then(setBriefing);
@@ -429,7 +450,7 @@ const App: React.FC = () => {
 
         {status === GameStatus.GAMEOVER && <GameOverOverlay t={t} score={score} onRedeploy={initGame} onBackHome={returnToHome} />}
         {status === GameStatus.PAUSED && <PauseOverlay t={t} onResume={() => setStatus(GameStatus.PLAYING)} onBackHome={returnToHome} />}
-        {status === GameStatus.PLAYING && <button className="stage-pause" onClick={() => { touchTargetRef.current = null; setStatus(GameStatus.PAUSED); }} aria-label={t.pauseTitle}>Ⅱ</button>}
+        {status === GameStatus.PLAYING && <button className="stage-pause" onClick={() => { touchTargetRef.current = null; keysRef.current = {}; setStatus(GameStatus.PAUSED); }} aria-label={t.pauseTitle}>Ⅱ</button>}
           </div>
           <div className="controls-hint">{isTouchDevice ? controlHints[language].touch : controlHints[language].keyboard}</div>
         </section>
