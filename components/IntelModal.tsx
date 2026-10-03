@@ -2,7 +2,7 @@ import React from 'react';
 import { X } from 'lucide-react';
 import { Translation } from '../i18n';
 import { EnemySubType } from '../types';
-import { shipAssets } from '../render/ships';
+import { modelPreviews } from '../render/modelManifest';
 
 interface IntelModalProps {
   t: Translation;
@@ -21,7 +21,7 @@ export const IntelModal: React.FC<IntelModalProps> = ({ t, onClose }) => {
       <div className="modal-header"><div><span className="eyebrow">HOSTILE IDENTIFICATION / 04</span><h2>{t.intelTitle}</h2></div><button className="icon-button" onClick={onClose} aria-label={t.backHome}><X size={20} /></button></div>
       <div className="modal-intro"><p>{t.enemyFleetTitle}</p><strong>HOSTILE CONTACTS</strong></div>
       <div className="modal-scroll enemy-list">{units.map((unit) => <div className={'enemy-card enemy-' + unit.id} key={unit.id}>
-        <div className="enemy-art"><img src={shipAssets[unit.id]} alt="" /></div>
+        <div className="enemy-art"><img src={modelPreviews[unit.id]} alt="" /></div>
         <div><span className="eyebrow">THREAT CLASS {unit.threat}</span><h3>{unit.name}</h3><p>{unit.desc}</p></div>
       </div>)}</div>
       <div className="modal-footer"><span>INTELLIGENCE VERIFIED</span><button className="secondary-button" onClick={onClose}>{t.backHome}</button></div>

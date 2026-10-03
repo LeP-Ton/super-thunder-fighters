@@ -10,10 +10,16 @@
 - 启动开发服务器：npm run dev
 - 类型检查：npx tsc --noEmit
 - 生产构建：npm run build
+- 浏览器验收：先运行开发服务器，再运行 npm run qa:browser（需要本机 Chrome）
 
 ## 操作
 
 - 桌面：WASD 或方向键移动，空格或 Enter 开火，数字键 1–3 切换战机，Esc 暂停。
 - 手机：在战场拖动战机移动，自动开火；能量满时点击上方战机切换，点击战场右上角暂停。
 
-战斗画面使用 Canvas 2D，机体与弹体图像保存在 public/assets/。
+## 画面与素材
+
+- React 负责界面，Three.js WebGL 负责俯视 3D 战斗画面；战斗规则仍按 60 Hz 固定时间步和 600×800 逻辑坐标运行。
+- 六架玩家战机、四类敌机的 GLB 位于 `public/assets/models/`，可编辑的 Blender 源文件位于 `assets/model-sources/`，同源预览图位于 `public/assets/previews/`。
+- WebGL 2 不可用时，战斗画面使用已有 Canvas 2D 资源。
+- 模型来源、CC0 授权及重建流程见 `assets/model-sources/README.md`。

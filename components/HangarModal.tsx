@@ -2,7 +2,7 @@ import React from 'react';
 import { Check, X } from 'lucide-react';
 import { GameStatus, PlaneDef, PlaneId } from '../types';
 import { Translation } from '../i18n';
-import { shipAssets } from '../render/ships';
+import { modelPreviews } from '../render/modelManifest';
 
 interface HangarModalProps {
   t: Translation;
@@ -25,7 +25,7 @@ export const HangarModal: React.FC<HangarModalProps> = ({ t, planes, selectedPla
           const selected = selectedPlanes.includes(plane.id);
           const locked = !selected && selectedPlanes.length >= 3;
           return <button key={plane.id} className={'plane-card ' + (selected ? 'selected' : '')} onClick={() => onTogglePlane(plane.id)} disabled={status !== GameStatus.START || locked} aria-pressed={selected}>
-            <div className="plane-card-art"><img src={shipAssets[plane.id]} alt="" /><span>{selected ? <Check size={15} /> : '0' + (planes.indexOf(plane) + 1)}</span></div>
+            <div className="plane-card-art"><img src={modelPreviews[plane.id]} alt="" /><span>{selected ? <Check size={15} /> : '0' + (planes.indexOf(plane) + 1)}</span></div>
             <div className="plane-card-info"><span className="eyebrow">{t.planeRoles[plane.id]}</span><h3>{t.planeNames[plane.id]}</h3><p>{t.planeTraits[plane.id]}</p><div className="plane-stats"><span>{t.hp} <b>{Math.round(plane.maxHealth * hpScale)}</b></span><span>{t.speed} <b>{plane.speed.toFixed(1)}</b></span><span>{t.fireRate} <b>{(1000 / plane.fireRate).toFixed(1)}</b></span></div></div>
           </button>;
         })}

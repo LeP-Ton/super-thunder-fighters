@@ -5,8 +5,10 @@ import { CANVAS_WIDTH, CANVAS_HEIGHT } from './constants';
 import { PLANE_DEFS, PLANE_BY_ID, DEFAULT_LOADOUT, ENERGY_MAX } from './planes';
 import { getPilotBriefing, Briefing } from './services/geminiService';
 import { translations, Language } from './i18n';
-import { drawProjectile, drawShip, shipAssets } from './render/ships';
+import { drawProjectile, drawShip } from './render/ships';
+import { modelPreviews } from './render/modelManifest';
 import { drawBackground } from './render/background';
+import { BattleScene } from './render/battleScene';
 import { updateGame } from './game/engine';
 import { advanceFixedClock, createFixedClock } from './game/fixedStep';
 import { buildPlaneStates } from './game/state';
@@ -29,7 +31,9 @@ const controlHints: Record<Language, { touch: string; keyboard: string }> = {
 
 const App: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const battleSceneRef = useRef<BattleScene | null>(null);
   const pixelRatioRef = useRef(1);
+  const [visualsReady, setVisualsReady] = useState(false);
   const touchTargetRef = useRef<{ x: number; y: number } | null>(null);
   const activePointerRef = useRef<number | null>(null);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
@@ -94,6 +98,10 @@ const App: React.FC = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const syncResolution = () => {
+      if (battleSceneRef.current) {
+        battleSceneRef.current.resize();
+        return;
+      }
       const ratio = Math.min(2, window.devicePixelRatio || 1);
       pixelRatioRef.current = ratio;
       canvas.width = Math.round(CANVAS_WIDTH * ratio);
@@ -194,7 +202,7 @@ const App: React.FC = () => {
     setStatus(GameStatus.PLAYING);
   };
 
-  const canStart = selectedPlanes.length === 3;
+  const canStart = selectedPlanes.length === 3 && visualsReady;
 
   const togglePlaneSelection = (planeId: PlaneId) => {
     setSelectedPlanes((prev) => {
@@ -246,11 +254,14 @@ const App: React.FC = () => {
     switchToPlane(planeId);
   }, [selectedPlanes, switchToPlane]);
 
-  const draw = useCallback(() => {
+  const draw = useCallback((time = performance.now()) => {
+    if (battleSceneRef.current) {
+      battleSceneRef.current.render(gameStateRef.current, time);
+      return;
+    }
     const ctx = canvasRef.current?.getContext('2d');
     if (!ctx) return;
     const state = gameStateRef.current;
-    const time = performance.now();
     ctx.setTransform(pixelRatioRef.current, 0, 0, pixelRatioRef.current, 0, 0);
     drawBackground(ctx, time);
     state.particles.forEach(p => {
@@ -286,6 +297,31 @@ const App: React.FC = () => {
     state.bullets.forEach(b => drawProjectile(ctx, b));
   }, []);
 
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    let mounted = true;
+    try {
+      const battleScene = new BattleScene(canvas);
+      battleSceneRef.current = battleScene;
+      battleScene.render(gameStateRef.current, performance.now());
+      battleScene.loadModels().finally(() => {
+        if (!mounted) return;
+        setVisualsReady(true);
+        battleScene.render(gameStateRef.current, performance.now());
+      });
+    } catch (error) {
+      console.warn('WebGL 2 不可用，启用 Canvas 2D 画面。', error);
+      setVisualsReady(true);
+      draw();
+    }
+    return () => {
+      mounted = false;
+      battleSceneRef.current?.dispose();
+      battleSceneRef.current = null;
+    };
+  }, [draw]);
+
   const update = useCallback((time: number) => {
     const { updated, shouldContinue } = advanceFixedClock(clockRef.current, time, (stepTime) => {
       return updateGame({
@@ -303,7 +339,7 @@ const App: React.FC = () => {
         setStatus
       });
     });
-    if (updated) draw();
+    if (updated || battleSceneRef.current) draw(time);
     if (shouldContinue) requestRef.current = requestAnimationFrame(update);
   }, [status, defaultPlane, draw, isTouchDevice]);
 
@@ -355,6 +391,10 @@ const App: React.FC = () => {
   }, [status, update]);
 
   useEffect(() => {
+    if (status !== GameStatus.PLAYING) draw();
+  }, [status, draw]);
+
+  useEffect(() => {
     getPilotBriefing(level, score, language).then(setBriefing);
   }, [level, score, language]);
 
@@ -402,7 +442,7 @@ const App: React.FC = () => {
           <div className="command-divider" />
           <div className="selected-unit">
             <span className="eyebrow">{t.hangarTitle} / ACTIVE INTERCEPTOR</span>
-            <img src={shipAssets[activePlaneId]} alt="" />
+            <img src={modelPreviews[activePlaneId]} alt="" />
             <strong>{t.planeNames[activePlaneId]}</strong>
             <small>{t.planeRoles[activePlaneId]}</small>
           </div>

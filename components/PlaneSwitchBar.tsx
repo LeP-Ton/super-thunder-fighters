@@ -2,7 +2,7 @@ import React from 'react';
 import { PlaneId } from '../types';
 import { PLANE_BY_ID, ENERGY_MAX } from '../planes';
 import { Translation } from '../i18n';
-import { shipAssets } from '../render/ships';
+import { modelPreviews } from '../render/modelManifest';
 
 interface PlaneSwitchBarProps {
   selectedPlanes: PlaneId[];
@@ -20,7 +20,7 @@ export const PlaneSwitchBar: React.FC<PlaneSwitchBarProps> = ({ selectedPlanes, 
         const isActive = planeId === activePlaneId;
         const canSwitch = energy >= ENERGY_MAX && !isActive;
         return <button key={planeId} className={'switch-slot ' + (isActive ? 'active' : '')} onClick={() => onSwitch(planeId)} disabled={!canSwitch}>
-          <span>{idx + 1}</span><img src={shipAssets[planeId]} alt="" /><b>{t.planeNames[planeId] ?? PLANE_BY_ID[planeId].name}</b>{canSwitch && <em>{t.ready}</em>}
+          <span>{idx + 1}</span><img src={modelPreviews[planeId]} alt="" /><b>{t.planeNames[planeId] ?? PLANE_BY_ID[planeId].name}</b>{canSwitch && <em>{t.ready}</em>}
         </button>;
       })}
     </div>

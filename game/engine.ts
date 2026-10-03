@@ -114,6 +114,8 @@ export const updateGame = ({
   const damageTakenMult = activePlane.damageTakenMult ?? 1;
   const isOverheated = updatePlaneHeat(activePlane, activePlaneState, time, dt);
   const moveSpeed = getPlaneMoveSpeed(activePlane, activePlaneState, time, isOverheated);
+  const previousX = player.pos.x;
+  const previousY = player.pos.y;
 
   if (keys['ArrowLeft'] || keys['a']) player.pos.x -= moveSpeed;
   if (keys['ArrowRight'] || keys['d']) player.pos.x += moveSpeed;
@@ -133,6 +135,9 @@ export const updateGame = ({
 
   player.pos.x = Math.max(0, Math.min(CANVAS_WIDTH - player.size.x, player.pos.x));
   player.pos.y = Math.max(0, Math.min(CANVAS_HEIGHT - player.size.y, player.pos.y));
+  // 仅供 3D 机身倾斜使用；碰撞和战斗移动仍读取原来的逻辑坐标。
+  player.velocity.x = player.pos.x - previousX;
+  player.velocity.y = player.pos.y - previousY;
 
   if (keys[' '] || keys['Enter'] || autoFire) {
     const newBullets = tryFirePlayer(activePlane, activePlaneState, player, time, getPlayerProjectileColor(activePlane.id));

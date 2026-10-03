@@ -2,7 +2,7 @@ import React from 'react';
 import { ArrowUpRight, Crosshair, Info, Play, Settings2 } from 'lucide-react';
 import { Translation } from '../i18n';
 import { Briefing } from '../services/geminiService';
-import { shipAssets } from '../render/ships';
+import { modelPreviews } from '../render/modelManifest';
 
 interface StartOverlayProps {
   t: Translation;
@@ -19,7 +19,7 @@ export const StartOverlay: React.FC<StartOverlayProps> = ({ t, briefing, canStar
     <div className="start-topline"><span>ORBITAL FRONT // SECTOR 07</span><span>FLIGHT STATUS / READY</span></div>
     <div className="start-hero">
       <div className="hero-aura" />
-      <img src={shipAssets.vanguard} alt="" />
+      <img src={modelPreviews.vanguard} alt="" />
       <div className="hero-label">VANGUARD / 001</div>
     </div>
     <div className="start-content">
