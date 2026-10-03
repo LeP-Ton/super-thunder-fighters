@@ -2,10 +2,11 @@ import React, { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { loadShipAsset } from "../render/modelLibrary";
+import { createParkedDisplay } from "../render/parkedDisplay";
 import {
-  createParkedDisplay,
-  frameParkedDisplay,
-} from "../render/parkedDisplay";
+  createHangarEnvironment,
+  frameHangarCamera,
+} from "../render/hangarEnvironment";
 import { modelPreviews, ShipKind } from "../render/modelManifest";
 
 interface ShipShowcaseProps {
@@ -14,6 +15,7 @@ interface ShipShowcaseProps {
   paused?: boolean;
   interactive?: boolean;
   className?: string;
+  home?: boolean;
 }
 
 export const ShipShowcase: React.FC<ShipShowcaseProps> = ({
@@ -22,10 +24,13 @@ export const ShipShowcase: React.FC<ShipShowcaseProps> = ({
   paused = false,
   interactive = true,
   className = "",
+  home = false,
 }) => {
   const hostRef = useRef<HTMLDivElement>(null);
   const pausedRef = useRef(paused);
   const [ready, setReady] = useState(false);
+  const [unavailable, setUnavailable] = useState(false);
+  const loadRef = useRef<((kind: ShipKind) => void) | null>(null);
   useEffect(() => {
     pausedRef.current = paused;
   }, [paused]);
@@ -34,6 +39,7 @@ export const ShipShowcase: React.FC<ShipShowcaseProps> = ({
     const host = hostRef.current;
     if (!host) return;
     setReady(false);
+    setUnavailable(false);
     let renderer: THREE.WebGLRenderer;
     try {
       renderer = new THREE.WebGLRenderer({
@@ -42,6 +48,7 @@ export const ShipShowcase: React.FC<ShipShowcaseProps> = ({
         powerPreference: "high-performance",
       });
     } catch {
+      setUnavailable(true);
       return;
     }
     let disposed = false;
@@ -49,9 +56,9 @@ export const ShipShowcase: React.FC<ShipShowcaseProps> = ({
     let needsRender = true;
     let parkedDisplay: ReturnType<typeof createParkedDisplay> | undefined;
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
-    camera.position.set(7.6, 4.8, -9.4);
-    renderer.setClearColor(0x000000, 0);
+    scene.fog = new THREE.FogExp2("#16202a", 0.009);
+    const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 500);
+    renderer.setClearColor("#090f17", 1);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 0.94;
@@ -67,44 +74,16 @@ export const ShipShowcase: React.FC<ShipShowcaseProps> = ({
     const generator = new THREE.PMREMGenerator(renderer);
     const environment = generator.fromScene(environmentScene, 0.04);
     scene.environment = environment.texture;
-    scene.environmentIntensity = 0.48;
+    scene.environmentIntensity = 0.38;
     environmentScene.dispose();
     generator.dispose();
 
-    const main = new THREE.DirectionalLight("#e8f2ff", 2.4);
-    main.position.set(-3, 8, -4);
-    main.castShadow = true;
-    main.shadow.mapSize.set(2048, 2048);
-    Object.assign(main.shadow.camera, {
-      left: -6,
-      right: 6,
-      top: 6,
-      bottom: -6,
-      near: 0.1,
-      far: 30,
+    const hangar = createHangarEnvironment(() => {
+      needsRender = true;
     });
-    main.shadow.normalBias = 0.012;
-    main.shadow.bias = -0.0001;
-    scene.add(main);
-    const edge = new THREE.DirectionalLight("#ffb273", 1.6);
-    edge.position.set(-6, 3, 7);
-    scene.add(edge);
-    const fill = new THREE.DirectionalLight("#aecae5", 1.1);
-    fill.position.set(6, 1, -3);
-    scene.add(fill);
-
-    const floorGeometry = new THREE.PlaneGeometry(32, 32);
-    const floorMaterial = new THREE.ShadowMaterial({ opacity: 0.32 });
-    const floor = new THREE.Mesh(floorGeometry, floorMaterial);
-    floor.rotation.x = -Math.PI / 2;
-    floor.position.y = 0;
-    floor.receiveShadow = true;
-    scene.add(floor);
-
+    scene.add(hangar.group);
     const turntable = new THREE.Group();
     scene.add(turntable);
-    const target = new THREE.Vector3();
-    const rotationMatrix = new THREE.Matrix4();
     let rotation = 0;
     let targetRotation = 0;
     let pointer: { id: number; x: number } | undefined;
@@ -142,23 +121,11 @@ export const ShipShowcase: React.FC<ShipShowcaseProps> = ({
     canvas.addEventListener("pointercancel", pointerUp);
     canvas.addEventListener("lostpointercapture", pointerUp);
 
-    const fitCamera = () => {
-      if (!parkedDisplay) return;
-      // 背景为固定机库透视，只转动战机，地面、标线与光照保持同一方向。
-      rotationMatrix.makeRotationY(rotation);
-      const points = parkedDisplay.framePoints.map((point) =>
-        point.clone().applyMatrix4(rotationMatrix),
-      );
-      const bounds = new THREE.Box3().setFromPoints(points);
-      frameParkedDisplay(camera, bounds, points, target, interactive);
-    };
     const resize = () => {
       const { width, height } = host.getBoundingClientRect();
       if (width < 1 || height < 1) return;
-      camera.aspect = width / height;
-      fitCamera();
-      camera.updateProjectionMatrix();
-      // setSize(false) 只更新渲染缓冲区；CSS 尺寸必须独立，否则 Retina 会放大并裁切。
+      // 取景不依赖模型是否到达，冷启动与切机都保持同一地面和舱口。
+      frameHangarCamera(camera, width, height, home);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
       renderer.setSize(width, height, false);
       needsRender = true;
@@ -168,24 +135,35 @@ export const ShipShowcase: React.FC<ShipShowcaseProps> = ({
     window.addEventListener("resize", resize);
     resize();
 
-    loadShipAsset(kind)
-      .then((asset) => {
-        if (disposed) return;
-        parkedDisplay = createParkedDisplay(asset);
-        turntable.add(parkedDisplay.aircraft);
-        scene.add(parkedDisplay.markings);
-        main.target.position.copy(
-          parkedDisplay.bounds.getCenter(new THREE.Vector3()),
-        );
-        scene.add(main.target);
-        resize();
-        renderer.render(scene, camera);
-        needsRender = false;
-        setReady(true);
-      })
-      .catch(() => {
-        /* 保留同源静态预览，避免设备不支持 WebGL 时出现空白。 */
-      });
+    // 新模型就绪后原位替换；加载时保留当前 3D 场景，不插入另一机位的缩略图。
+    let generation = 0;
+    loadRef.current = (nextKind) => {
+      const request = ++generation;
+      setReady(false);
+      setUnavailable(false);
+      loadShipAsset(nextKind)
+        .then((asset) => {
+          if (disposed || request !== generation) return;
+          const next = createParkedDisplay(asset);
+          if (parkedDisplay) {
+            turntable.remove(parkedDisplay.aircraft);
+            scene.remove(parkedDisplay.markings);
+            parkedDisplay.dispose();
+          }
+          parkedDisplay = next;
+          turntable.add(next.aircraft);
+          scene.add(next.markings);
+          rotation = targetRotation = 0;
+          turntable.rotation.y = 0;
+          renderer.render(scene, camera);
+          needsRender = false;
+          setReady(true);
+        })
+        .catch(() => {
+          if (!disposed && request === generation) setUnavailable(true);
+        });
+    };
+    renderer.render(scene, camera);
 
     let previous = performance.now();
     const animate = (now: number) => {
@@ -210,7 +188,6 @@ export const ShipShowcase: React.FC<ShipShowcaseProps> = ({
         if (Math.abs(targetRotation - rotation) < 0.0001)
           rotation = targetRotation;
         turntable.rotation.y = rotation;
-        fitCamera();
         needsRender = true;
       }
       if (needsRender) {
@@ -229,24 +206,29 @@ export const ShipShowcase: React.FC<ShipShowcaseProps> = ({
       canvas.removeEventListener("pointerup", pointerUp);
       canvas.removeEventListener("pointercancel", pointerUp);
       canvas.removeEventListener("lostpointercapture", pointerUp);
+      loadRef.current = null;
       parkedDisplay?.dispose();
-      floorGeometry.dispose();
-      floorMaterial.dispose();
-      main.shadow.dispose();
+      hangar.dispose();
       environment.dispose();
       renderer.dispose();
       renderer.forceContextLoss();
       renderer.domElement.remove();
     };
-  }, [kind, interactive]);
+  }, [interactive, home]);
+
+  useEffect(() => {
+    loadRef.current?.(kind);
+  }, [kind, interactive, home]);
 
   return (
     <div
-      className={`ship-showcase ${className} ${ready ? "is-ready" : ""}`}
+      className={`ship-showcase ${className} ${ready ? "is-ready" : ""} ${unavailable ? "is-unavailable" : ""}`}
       role="img"
       aria-label={label}
     >
-      <img className="showcase-fallback" src={modelPreviews[kind]} alt="" />
+      {unavailable && (
+        <img className="showcase-fallback" src={modelPreviews[kind]} alt="" />
+      )}
       <div className="showcase-canvas" ref={hostRef} />
     </div>
   );

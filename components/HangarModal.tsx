@@ -63,7 +63,6 @@ export const HangarModal: React.FC<HangarModalProps> = ({
               <p>{t.planeRoles[focused]}</p>
             </div>
             <ShipShowcase
-              key={focused}
               kind={focused}
               label={t.planeNames[focused]}
             />

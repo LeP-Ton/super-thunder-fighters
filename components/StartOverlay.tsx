@@ -40,6 +40,7 @@ export const StartOverlay: React.FC<StartOverlayProps> = ({
       <div className="hangar-backdrop" />
       <div className="hero-model">
         <ShipShowcase
+          home
           kind={featured}
           label={t.planeNames[featured]}
           paused={obscured}
@@ -58,7 +59,7 @@ export const StartOverlay: React.FC<StartOverlayProps> = ({
           onClick={onStart}
           disabled={!canStart}
         >
-          <span>{canStart ? t.initiate : copy.loading}</span>
+          <span>{t.initiate}</span>
           <ArrowUpRight size={23} />
         </button>
         <button className="hero-intel" onClick={onShowIntel}>

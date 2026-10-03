@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { mkdir, writeFile } from "node:fs/promises";
 import puppeteer from "puppeteer-core";
 
-const output = process.env.QA_OUTPUT || "/private/tmp/super-thunder-parking";
+const output = process.env.QA_OUTPUT || "/private/tmp/super-thunder-hangar-3d";
 await mkdir(output, { recursive: true });
 const browser = await puppeteer.launch({
   executablePath:
@@ -54,10 +54,57 @@ try {
     results.dimensions.push({ selector, ...result });
   };
   await page.setViewport({ width: 1511, height: 818, deviceScaleFactor: 2 });
+  let blockModels = true;
+  const pendingModels = [];
+  await page.setCacheEnabled(false);
+  await page.setRequestInterception(true);
+  const handleRequest = (request) => {
+    if (blockModels && request.url().endsWith(".glb"))
+      pendingModels.push(request);
+    else request.continue();
+  };
+  page.on("request", handleRequest);
   await page.goto(process.env.QA_URL || "http://127.0.0.1:3000/", {
-    waitUntil: "networkidle2",
+    waitUntil: "domcontentloaded",
   });
+  await page.waitForSelector(".hero-model canvas");
+  await page.evaluate(() => document.fonts.ready);
+  await new Promise((resolve) => setTimeout(resolve, 1800));
+  const launchBefore = await page.$eval(
+    ".launch-button",
+    (node) => node.textContent,
+  );
+  assert.equal(
+    await page.$(".hero-model .showcase-fallback"),
+    null,
+    "加载时不能展示错误机位的缩略图",
+  );
+  assert.equal(await page.$(".hero-model .is-ready"), null);
+  const backdropBefore = await page.screenshot({
+    clip: { x: 0, y: 0, width: 350, height: 300 },
+  });
+  await page.screenshot({ path: `${output}/loading.png` });
+  blockModels = false;
+  await Promise.all(pendingModels.map((request) => request.continue()));
   await ready(".hero-model");
+  await page.waitForSelector(".launch-button:not([disabled])");
+  const backdropAfter = await page.screenshot({
+    clip: { x: 0, y: 0, width: 350, height: 300 },
+  });
+  assert.ok(backdropBefore.equals(backdropAfter), "加载前后机库构图不能移动");
+  const launchAfter = await page.$eval(
+    ".launch-button",
+    (node) => node.textContent,
+  );
+  assert.equal(launchBefore, launchAfter, "加载不应切换首页按钮文案");
+  results.coldStart = {
+    modelsDelayed: pendingModels.length,
+    backdropStable: true,
+    noPlaceholder: true,
+    launchLabelStable: true,
+  };
+  page.off("request", handleRequest);
+  await page.setRequestInterception(false);
   // 连续切换像素密度，包含 CSS 尺寸不变的跨屏场景。
   for (const [width, height, deviceScaleFactor] of [
     [1511, 818, 1],
@@ -66,12 +113,16 @@ try {
     [1511, 818, 2],
     [1920, 1080, 2],
     [1280, 720, 2],
+    [768, 1024, 2],
     [390, 844, 3],
   ]) {
     await page.setViewport({ width, height, deviceScaleFactor });
     await settle();
     await checkDimensions(".hero-model");
-    if (width === 390) await page.screenshot({ path: `${output}/mobile.png` });
+    if (width === 390 || width === 768)
+      await page.screenshot({
+        path: `${output}/${width === 390 ? "mobile" : "tablet"}.png`,
+      });
   }
   await page.setViewport({ width: 1511, height: 818, deviceScaleFactor: 2 });
   await settle();
@@ -82,10 +133,15 @@ try {
   ]) {
     await page.click(`.main-nav button:nth-child(${nav})`);
     await ready(panel);
+    const canvasIdentity = await page.$(`${panel} canvas`);
     for (let index = 1; index <= count; index++) {
       await page.click(`${card}:nth-child(${index})`);
       await ready(panel);
       await checkDimensions(panel);
+      assert.ok(
+        await page.evaluate((canvas) => canvas.isConnected, canvasIdentity),
+        "切机必须复用机库与画布",
+      );
       results.selections.push(
         await page.$eval(`${panel} .ship-showcase`, (node) =>
           node.getAttribute("aria-label"),
@@ -123,9 +179,8 @@ try {
     const THREE = await import("/node_modules/.vite/deps/three.js");
     const { modelKinds } = await import("/render/modelManifest.ts");
     const { loadShipAsset } = await import("/render/modelLibrary.ts");
-    const { createParkedDisplay, frameParkedDisplay } = await import(
-      "/render/parkedDisplay.ts"
-    );
+    const { createParkedDisplay } = await import("/render/parkedDisplay.ts");
+    const { frameHangarCamera } = await import("/render/hangarEnvironment.ts");
     const models = [];
     for (const kind of modelKinds) {
       const display = createParkedDisplay(await loadShipAsset(kind));
@@ -143,22 +198,39 @@ try {
         }
       });
       let maxProjected = 0;
+      let worstCase;
       let cases = 0;
-      // 使用全部真实顶点独立验证，防止仅验证取景算法自己的轮廓数据。
-      for (const aspect of [0.9, 1.55, 2.37]) {
+      // 遍历真实机体顶点，独立验证首页/检视在各纵横比下的固定相机构图。
+      for (const [width, height, home] of [
+        [1511, 818, true],
+        [1280, 720, true],
+        [768, 1024, true],
+        [390, 844, true],
+        [800, 520, false],
+        [390, 260, false],
+        [500, 600, false],
+      ]) {
         for (const rotation of [0, 0.7, 2.3, 4.6]) {
           const matrix = new THREE.Matrix4().makeRotationY(rotation);
-          const points = display.framePoints.map((point) =>
-            point.clone().applyMatrix4(matrix),
+          const camera = new THREE.PerspectiveCamera(
+            35,
+            width / height,
+            0.1,
+            500,
           );
-          const bounds = new THREE.Box3().setFromPoints(points);
-          const camera = new THREE.PerspectiveCamera(35, aspect, 0.1, 100);
-          const target = new THREE.Vector3();
-          camera.position.set(7.6, 4.8, -9.4);
-          frameParkedDisplay(camera, bounds, points, target, true);
+          frameHangarCamera(camera, width, height, home);
           camera.updateMatrixWorld(true);
           for (const vertex of vertices) {
             const point = vertex.clone().applyMatrix4(matrix).project(camera);
+            if (Math.max(Math.abs(point.x), Math.abs(point.y)) > maxProjected)
+              worstCase = {
+                width,
+                height,
+                home,
+                rotation,
+                x: point.x,
+                y: point.y,
+              };
             maxProjected = Math.max(
               maxProjected,
               Math.abs(point.x),
@@ -173,9 +245,9 @@ try {
       models.push({
         kind,
         vertices: vertices.length,
-        outlineVertices: display.framePoints.length,
         floor: display.bounds.min.y,
         maxProjected,
+        worstCase,
         cases,
       });
       display.dispose();
@@ -185,7 +257,10 @@ try {
   assert.equal(results.models.length, 10);
   for (const model of results.models) {
     assert.ok(Math.abs(model.floor) < 0.002, `${model.kind} 起落架需要接地`);
-    assert.ok(model.maxProjected <= 0.821, `${model.kind} 旋转后不能裁切`);
+    assert.ok(
+      model.maxProjected <= 0.96,
+      `${model.kind} 旋转后不能裁切：${JSON.stringify(model.worstCase)}`,
+    );
   }
   assert.deepEqual(results.errors, []);
   await writeFile(
@@ -199,6 +274,7 @@ try {
         dimensions: results.dimensions.length,
         selections: results.selections,
         modelCases: results.models.reduce((sum, item) => sum + item.cases, 0),
+        coldStart: results.coldStart,
         errors: results.errors,
       },
       null,

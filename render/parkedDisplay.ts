@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import { ConvexHull } from "three/addons/math/ConvexHull.js";
 import { instantiateShip, ShipAsset } from "./modelLibrary";
 
 /** 起落架与机位标线仅用于停放展示，不进入战斗模型或碰撞计算。 */
@@ -28,6 +27,29 @@ export function createParkedDisplay(asset: ShipAsset) {
   [metal, rubber, paint].forEach((material) => materials.add(material));
 
   const ship = instantiateShip(asset, 8.6);
+  // 停放时关闭发动机高温发光；克隆材质以免改变战斗中的共享喷口。
+  const parkedMaterials = new Map<THREE.Material, THREE.Material>();
+  ship.traverse((node) => {
+    if (!(node instanceof THREE.Mesh)) return;
+    const parkedMaterial = (source: THREE.Material) => {
+      if (
+        !(source instanceof THREE.MeshStandardMaterial) ||
+        !source.name.includes("热喷口")
+      )
+        return source;
+      if (!parkedMaterials.has(source)) {
+        const clone = source.clone();
+        clone.color.set("#302b27");
+        clone.emissiveIntensity = 0.12;
+        parkedMaterials.set(source, clone);
+        materials.add(clone);
+      }
+      return parkedMaterials.get(source)!;
+    };
+    node.material = Array.isArray(node.material)
+      ? node.material.map(parkedMaterial)
+      : parkedMaterial(node.material);
+  });
   const hullBounds = new THREE.Box3().setFromObject(ship);
   const hullSize = hullBounds.getSize(new THREE.Vector3());
   const clearance = 0.53;
@@ -96,15 +118,9 @@ export function createParkedDisplay(asset: ShipAsset) {
     hub.castShadow = true;
     aircraft.add(hub);
   });
-  aircraft.rotation.y = -0.13;
+  aircraft.rotation.y = 0;
 
   const parkingBounds = new THREE.Box3().setFromObject(aircraft);
-  // 只在装配时提取轮廓顶点，拖动取景无需遍历数万个原始顶点。
-  const hull = new ConvexHull().setFromObject(aircraft);
-  const silhouette = new Set<THREE.Vector3>();
-  hull.faces.forEach((face) => {
-    for (let i = 0; i < 3; i++) silhouette.add(face.getEdge(i).head().point);
-  });
   const halfWidth =
     Math.max(Math.abs(parkingBounds.min.x), parkingBounds.max.x) + 0.48;
   const halfLength =
@@ -131,44 +147,9 @@ export function createParkedDisplay(asset: ShipAsset) {
     aircraft,
     markings,
     bounds: parkingBounds,
-    framePoints: [...silhouette],
     dispose() {
       geometries.forEach((geometry) => geometry.dispose());
       materials.forEach((material) => material.dispose());
     },
   };
-}
-
-/** 根据实际模型边界和容器纵横比取景，屏幕像素密度不参与物体尺寸。 */
-export function frameParkedDisplay(
-  camera: THREE.PerspectiveCamera,
-  bounds: THREE.Box3,
-  framePoints: THREE.Vector3[],
-  target: THREE.Vector3,
-  interactive: boolean,
-) {
-  const direction = camera.position.clone().sub(target).normalize();
-  const center = bounds.getCenter(new THREE.Vector3());
-  const right = new THREE.Vector3()
-    .crossVectors(camera.up, direction)
-    .normalize();
-  const up = new THREE.Vector3().crossVectors(direction, right).normalize();
-  const vertical = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
-  const horizontal = vertical * camera.aspect;
-  const fill = interactive ? 0.82 : 0.88;
-  let distance = 0;
-  // 包围盒的虚构角点会让扁平战机过小；凸包轮廓可同时保证完整显示和有效占幅。
-  for (const point of framePoints) {
-    const offset = point.clone().sub(center);
-    const depth = offset.dot(direction);
-    distance = Math.max(
-      distance,
-      depth + Math.abs(offset.dot(right)) / (horizontal * fill),
-      depth + Math.abs(offset.dot(up)) / (vertical * fill),
-    );
-  }
-  target.copy(center);
-  camera.position.copy(center).addScaledVector(direction, distance);
-  camera.lookAt(center);
-  camera.updateProjectionMatrix();
 }

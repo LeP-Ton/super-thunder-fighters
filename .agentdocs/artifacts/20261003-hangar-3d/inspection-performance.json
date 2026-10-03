@@ -1,0 +1,7 @@
+{
+  "viewport": "1440x900",
+  "dpr": 2,
+  "continuousInspectionSeconds": 6,
+  "inspectionFps": 60,
+  "webglUnavailablePreview": true
+}

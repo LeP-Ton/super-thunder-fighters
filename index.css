@@ -217,6 +217,7 @@ img {
   background: var(--orange);
 }
 .start-overlay {
+  --home-header: 102px;
   min-height: calc(100svh - 148px);
   position: relative;
   padding: 0 4.5vw;
@@ -226,25 +227,20 @@ img {
 }
 .hangar-backdrop {
   position: absolute;
-  inset: -102px 0 -46px;
+  inset: calc(-1 * var(--home-header)) 0 -46px;
   background:
     linear-gradient(
       90deg,
-      rgba(9, 15, 18, 0.9) 0%,
-      rgba(9, 15, 18, 0.78) 25%,
-      rgba(9, 15, 18, 0.18) 62%,
-      rgba(9, 15, 18, 0.1)
+      #071015eb 0%,
+      #071015b8 29%,
+      #07101518 58%,
+      transparent 78%
     ),
-    linear-gradient(
-      0deg,
-      #101719 0%,
-      rgba(16, 23, 25, 0.4) 20%,
-      transparent 65%
-    ),
-    url("/assets/environments/orbital-hangar.png") center 53% / cover;
-  z-index: -2;
+    linear-gradient(0deg, #0b1318 0%, #0b131833 24%, transparent 48%);
+  z-index: 1;
   pointer-events: none;
 }
+
 .hero-copy {
   position: relative;
   z-index: 2;
@@ -315,13 +311,11 @@ img {
 }
 .hero-model {
   position: absolute;
-  left: 36%;
-  right: 5%;
-  top: 31%;
-  height: 56%;
-  z-index: 1;
+  inset: calc(-1 * var(--home-header)) 0 -46px;
+  z-index: 0;
   pointer-events: none;
 }
+
 .ship-showcase {
   position: relative;
   width: 100%;
@@ -334,12 +328,11 @@ img {
   display: block;
   position: absolute;
   inset: 0;
-  opacity: 0;
-  transition: opacity 0.5s;
+  opacity: 1;
   touch-action: none;
 }
-.is-ready .showcase-canvas {
-  opacity: 1;
+.is-unavailable .showcase-canvas {
+  display: none;
 }
 .showcase-fallback {
   position: absolute;
@@ -347,7 +340,12 @@ img {
   height: 100%;
   object-fit: contain;
   opacity: 1;
-  transition: opacity 0.5s;
+}
+.hero-model .showcase-fallback {
+  width: 45%;
+  height: 48%;
+  right: 8%;
+  top: 28%;
 }
 .is-ready .showcase-fallback {
   opacity: 0;
@@ -603,21 +601,12 @@ img {
   min-height: 520px;
   overflow: hidden;
 }
-.aircraft-inspection:before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(0deg, #17212699, #17212644),
-    url("/assets/environments/orbital-hangar.png") 65% center/cover;
-  opacity: 0.28;
-}
 .aircraft-inspection .ship-showcase {
   position: absolute;
-  inset: 60px 0 0;
-  height: calc(100% - 100px);
+  inset: 0;
   z-index: 1;
 }
+
 .inspection-heading {
   position: absolute;
   z-index: 2;
@@ -1344,11 +1333,6 @@ img {
   .hero-copy {
     margin-top: 6vh;
   }
-  .hero-model {
-    height: 56%;
-    left: 36%;
-    right: 5%;
-  }
   .home-bottom {
     bottom: 60px;
   }
@@ -1364,6 +1348,7 @@ img {
     height: 86px;
   }
   .start-overlay {
+    --home-header: 86px;
     min-height: calc(100svh - 132px);
   }
   .hero-copy {
@@ -1375,12 +1360,6 @@ img {
   }
   .hero-description {
     font-size: 12px;
-  }
-  .hero-model {
-    left: 35%;
-    right: 0;
-    height: 54%;
-    top: 28%;
   }
   .hero-aircraft-label {
     bottom: 30%;
@@ -1420,10 +1399,6 @@ img {
   .hangar-configuration {
     padding: 24px 22px;
   }
-  .aircraft-inspection .ship-showcase {
-    left: -6%;
-    width: 112%;
-  }
   .modal-header {
     padding: 0 26px;
   }
@@ -1458,11 +1433,6 @@ img {
   .launch-button {
     width: 224px;
     min-height: 55px;
-  }
-  .hero-model {
-    left: 36%;
-    right: 0;
-    top: 29%;
   }
   .hero-aircraft-label {
     bottom: 30%;
@@ -1567,13 +1537,21 @@ img {
     display: none;
   }
   .start-overlay {
+    --home-header: 76px;
     min-height: calc(100svh - 112px);
     padding: 0 24px;
     justify-content: flex-start;
   }
   .hangar-backdrop {
-    background-position: 62% center;
-    inset: -76px 0 16svh;
+    background: linear-gradient(
+      0deg,
+      #0b1318 0%,
+      #0b1318a6 17%,
+      transparent 45%,
+      #07101599 76%,
+      #071015ad 100%
+    );
+    bottom: -36px;
   }
   .hero-copy {
     width: 100%;
@@ -1595,12 +1573,11 @@ img {
     font-size: 10px;
     line-height: 1.8;
   }
-  .hero-model {
-    left: 0;
-    right: 0;
-    top: 26%;
-    height: 37%;
-    pointer-events: none;
+  .hero-model .showcase-fallback {
+    width: 88%;
+    height: 27%;
+    right: 6%;
+    top: 35%;
   }
   .hero-aircraft-label {
     display: none;
@@ -1953,10 +1930,6 @@ img {
   }
   .formation-card {
     height: 76px;
-  }
-  .hero-model {
-    top: 27%;
-    height: 57%;
   }
   .home-location {
     bottom: 40px;

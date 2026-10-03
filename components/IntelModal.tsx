@@ -46,7 +46,7 @@ export const IntelModal: React.FC<{
               <span className="eyebrow">HOSTILE — 0{index + 1}</span>
               <h3>{unit.name}</h3>
             </div>
-            <ShipShowcase key={unit.id} kind={unit.id} label={unit.name} />
+            <ShipShowcase kind={unit.id} label={unit.name} />
             <span className="rotate-hint">
               <MoveHorizontal size={15} />
               {copy.rotate}
