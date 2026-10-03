@@ -2,7 +2,7 @@ import { EnemySubType, PlaneId } from '../types';
 
 export type ShipKind = PlaneId | EnemySubType;
 
-// 十架机体分别使用不同的可商用 CC0 模型，统一由战斗与预览共用。
+// 十架机体由 CC0 机械组件与自制装甲构成；战斗、展示和降级预览共用。
 export const modelFiles: Record<ShipKind, string> = {
   vanguard: '/assets/models/vanguard.glb',
   strider: '/assets/models/strider.glb',

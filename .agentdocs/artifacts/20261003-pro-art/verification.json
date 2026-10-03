@@ -1,0 +1,183 @@
+{
+  "renderer": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+  "assetStructure": [
+    {
+      "kind": "vanguard",
+      "meshes": 9,
+      "sockets": 2
+    },
+    {
+      "kind": "strider",
+      "meshes": 9,
+      "sockets": 2
+    },
+    {
+      "kind": "tempest",
+      "meshes": 9,
+      "sockets": 4
+    },
+    {
+      "kind": "aegis",
+      "meshes": 9,
+      "sockets": 2
+    },
+    {
+      "kind": "nova",
+      "meshes": 9,
+      "sockets": 2
+    },
+    {
+      "kind": "specter",
+      "meshes": 9,
+      "sockets": 2
+    },
+    {
+      "kind": "grunt",
+      "meshes": 8,
+      "sockets": 2
+    },
+    {
+      "kind": "kamikaze",
+      "meshes": 8,
+      "sockets": 2
+    },
+    {
+      "kind": "elite",
+      "meshes": 8,
+      "sockets": 2
+    },
+    {
+      "kind": "super",
+      "meshes": 8,
+      "sockets": 4
+    }
+  ],
+  "fps": 60,
+  "paused": true,
+  "resumed": true,
+  "bankAngles": {
+    "right": -0.471528331788152,
+    "left": 0.47775075559348734,
+    "centered": 0.003215841819685241,
+    "switched": true
+  },
+  "combatSmoke": {
+    "fired": true,
+    "gameover": true
+  },
+  "title": "超级雷霆战机",
+  "titles": [
+    "Super Thunder Fighters",
+    "超级雷霆战机",
+    "スーパーサンダーファイターズ",
+    "슈퍼 썬더 파이터",
+    "Супер громовые истребители"
+  ],
+  "modelResults": [
+    {
+      "url": "http://127.0.0.1:3000/assets/models/vanguard.glb",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3000/assets/models/strider.glb",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3000/assets/models/tempest.glb",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3000/assets/models/nova.glb",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3000/assets/models/aegis.glb",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3000/assets/models/specter.glb",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3000/assets/models/grunt.glb",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3000/assets/models/kamikaze.glb",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3000/assets/models/elite.glb",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3000/assets/models/super.glb",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3000/assets/models/vanguard.glb",
+      "status": 304
+    },
+    {
+      "url": "http://127.0.0.1:3000/assets/models/strider.glb",
+      "status": 304
+    },
+    {
+      "url": "http://127.0.0.1:3000/assets/models/tempest.glb",
+      "status": 304
+    },
+    {
+      "url": "http://127.0.0.1:3000/assets/models/aegis.glb",
+      "status": 304
+    },
+    {
+      "url": "http://127.0.0.1:3000/assets/models/nova.glb",
+      "status": 304
+    },
+    {
+      "url": "http://127.0.0.1:3000/assets/models/specter.glb",
+      "status": 304
+    },
+    {
+      "url": "http://127.0.0.1:3000/assets/models/grunt.glb",
+      "status": 304
+    },
+    {
+      "url": "http://127.0.0.1:3000/assets/models/elite.glb",
+      "status": 304
+    },
+    {
+      "url": "http://127.0.0.1:3000/assets/models/super.glb",
+      "status": 304
+    },
+    {
+      "url": "http://127.0.0.1:3000/assets/models/kamikaze.glb",
+      "status": 304
+    }
+  ],
+  "hangarPreviews": 6,
+  "intelPreviews": 4,
+  "inspected": [
+    "先锋号",
+    "迅影",
+    "风暴",
+    "盾卫",
+    "新星",
+    "幽影"
+  ],
+  "inspectedEnemies": [
+    "集群拦截机",
+    "自爆无人机",
+    "精英攻击机",
+    "超级战斗机"
+  ],
+  "removed": true,
+  "assigned": true,
+  "mobileOverflow": false,
+  "fallback": {
+    "webgl": false,
+    "canvas2d": true,
+    "playing": true
+  },
+  "errors": []
+}

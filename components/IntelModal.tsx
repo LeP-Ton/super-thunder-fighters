@@ -1,30 +1,93 @@
-import React from 'react';
-import { X } from 'lucide-react';
-import { Translation } from '../i18n';
-import { EnemySubType } from '../types';
-import { modelPreviews } from '../render/modelManifest';
+import React, { useState } from "react";
+import { X, MoveHorizontal } from "lucide-react";
+import { Translation } from "../i18n";
+import { EnemySubType } from "../types";
+import { modelPreviews } from "../render/modelManifest";
+import { ShipShowcase } from "./ShipShowcase";
+import { PresentationCopy } from "./presentationCopy";
 
-interface IntelModalProps {
+export const IntelModal: React.FC<{
   t: Translation;
+  copy: PresentationCopy;
   onClose: () => void;
-}
-
-export const IntelModal: React.FC<IntelModalProps> = ({ t, onClose }) => {
-  const units: Array<{ id: EnemySubType; name: string; desc: string; threat: string }> = [
-    { id: 'grunt', name: t.swarm, desc: t.swarmDesc, threat: '01' },
-    { id: 'kamikaze', name: t.kamikaze, desc: t.kamikazeDesc, threat: '02' },
-    { id: 'elite', name: t.elite, desc: t.eliteDesc, threat: '03' },
-    { id: 'super', name: t.super, desc: t.superDesc, threat: '04' }
+}> = ({ t, copy, onClose }) => {
+  const units: Array<{ id: EnemySubType; name: string; desc: string }> = [
+    { id: "grunt", name: t.swarm, desc: t.swarmDesc },
+    { id: "kamikaze", name: t.kamikaze, desc: t.kamikazeDesc },
+    { id: "elite", name: t.elite, desc: t.eliteDesc },
+    { id: "super", name: t.super, desc: t.superDesc },
   ];
-  return <div className="screen-overlay modal-overlay">
-    <div className="modal-panel">
-      <div className="modal-header"><div><span className="eyebrow">HOSTILE IDENTIFICATION / 04</span><h2>{t.intelTitle}</h2></div><button className="icon-button" onClick={onClose} aria-label={t.backHome}><X size={20} /></button></div>
-      <div className="modal-intro"><p>{t.enemyFleetTitle}</p><strong>HOSTILE CONTACTS</strong></div>
-      <div className="modal-scroll enemy-list">{units.map((unit) => <div className={'enemy-card enemy-' + unit.id} key={unit.id}>
-        <div className="enemy-art"><img src={modelPreviews[unit.id]} alt="" /></div>
-        <div><span className="eyebrow">THREAT CLASS {unit.threat}</span><h3>{unit.name}</h3><p>{unit.desc}</p></div>
-      </div>)}</div>
-      <div className="modal-footer"><span>INTELLIGENCE VERIFIED</span><button className="secondary-button" onClick={onClose}>{t.backHome}</button></div>
+  const [index, setIndex] = useState(0);
+  const unit = units[index];
+  return (
+    <div
+      className="screen-overlay modal-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="intel-title"
+    >
+      <div className="modal-panel intel-panel">
+        <div className="modal-header">
+          <div>
+            <span className="eyebrow">INTELLIGENCE / RESTRICTED</span>
+            <h2 id="intel-title">{t.intelTitle}</h2>
+          </div>
+          <button
+            className="icon-button"
+            onClick={onClose}
+            aria-label={t.backHome}
+          >
+            <X size={22} />
+          </button>
+        </div>
+        <div className="intel-workspace">
+          <div className="aircraft-inspection hostile-inspection">
+            <div className="inspection-heading">
+              <span className="eyebrow">HOSTILE — 0{index + 1}</span>
+              <h3>{unit.name}</h3>
+            </div>
+            <ShipShowcase key={unit.id} kind={unit.id} label={unit.name} />
+            <span className="rotate-hint">
+              <MoveHorizontal size={15} />
+              {copy.rotate}
+            </span>
+          </div>
+          <div className="intel-details">
+            <span className="eyebrow">{copy.threat}</span>
+            <div className="threat-level">
+              0{index + 1}
+              <span>
+                {Array.from({ length: 4 }, (_, i) => (
+                  <i key={i} className={i <= index ? "active" : ""} />
+                ))}
+              </span>
+            </div>
+            <h3>{unit.name}</h3>
+            <p>{unit.desc}</p>
+            <div className="enemy-list">
+              {units.map((enemy, i) => (
+                <button
+                  className={"enemy-card " + (i === index ? "active" : "")}
+                  key={enemy.id}
+                  onClick={() => setIndex(i)}
+                >
+                  <div className="enemy-art">
+                    <img src={modelPreviews[enemy.id]} alt="" />
+                  </div>
+                  <strong>{enemy.name}</strong>
+                  <span>0{i + 1}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div className="modal-footer">
+          <span>{t.enemyFleetTitle}</span>
+          <button className="secondary-button" onClick={onClose}>
+            {t.backHome}
+          </button>
+        </div>
+      </div>
     </div>
-  </div>;
+  );
 };

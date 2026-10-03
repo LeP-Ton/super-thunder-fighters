@@ -4,17 +4,24 @@
 
 - 本项目是浏览器纵向卷轴射击游戏，支持六架玩家战机、四类敌机、难度选择和机型切换。
 - 使用 React 19、TypeScript、Vite 6 和 Three.js；游戏逻辑与 3D 战斗渲染分离。
-- 六架玩家战机与四类敌机使用本地 GLB 模型；可编辑 Blender 源文件位于 `assets/model-sources/`。WebGL 2 不可用时使用既有 Canvas 2D 美术资源。
+- 六架玩家战机与四类敌机使用本地 GLB 模型；可编辑 Blender 源文件位于 `assets/model-sources/`。WebGL 2 不可用时使用同一批最终模型生成的 Canvas 2D 俯视图。
 - 默认语言为中文，另支持英语、日语、韩语和俄语。
 
 ## 核心架构
 
 - App.tsx 管理游戏状态、输入事件、渲染循环和界面装配；`game/fixedStep.ts` 以 60 Hz 固定时间步驱动战斗更新，画面按浏览器刷新节奏绘制。
 - game/ 负责敌机生成、移动、攻击、碰撞、得分和机型特性。
-- `render/battleScene.ts` 负责 Three.js 俯视正交场景、GLB 加载、侧倾、弹体与粒子；`render/modelManifest.ts` 维护十类模型与预览资源映射；其他 `render/` 文件保留 Canvas 2D 降级画面。
-- components/ 负责 HUD、首页、机库、情报、设置及战斗结果界面。
+- `render/battleScene.ts` 负责 Three.js 俯视正交场景、侧倾、辉光、尾焰、弹体与粒子；`render/modelLibrary.ts` 统一缓存 GLB 下载与解析；`render/modelManifest.ts` 维护十类模型与预览资源映射；其他 `render/` 文件保留 Canvas 2D 降级画面。
+- components/ 负责 HUD、首页、机库、情报、设置及战斗结果界面；`ShipShowcase` 用同一 GLB 进行实时三维检视，模型几何和材质由共享库持有，视图销毁时只释放自己的渲染器、环境与阴影资源。
 - planes.ts 定义机型参数；i18n.ts 定义多语言文案；public/assets/ 存放美术资源。
-- 战斗逻辑坐标为 600×800，Three.js 正交场景与其一一对应；页面用 CSS 适配屏幕，渲染像素密度最多为 2。视觉侧倾只读取位移速度，不参与碰撞。
+- 战斗逻辑坐标为 600×800，Three.js 正交场景与其一一对应；页面用 CSS 适配屏幕，战斗像素密度最多为 1.5，展示最多为 1.75。视觉侧倾只读取位移速度，不参与碰撞。
+
+## 美术资产约定
+
+- `scripts/build_models.py` 使用 Greyoxide Shipyard CC0 机械组件并重新制作机身与 PBR 材质；`scripts/optimize_models.mjs` 输出 Meshopt 压缩 GLB，加载器使用本地解码器。
+- Blender 坐标 Z 向上、机首 +Y；GLB 坐标 Y 向上、机首 -Z。`exhaust_*` 空节点是喷口挂点，优化不能移除。
+- 首页/机库/情报共用实时 3D 展示；斜视缩略图和俯视降级图由 `scripts/render_previews.py` 生成，禁止独立更换成不匹配的机体图片。
+- 场景位于 `public/assets/environments/`；模型来源与制作步骤见 `assets/model-sources/README.md`，生成场景提示词见场景目录 README。
 
 ## 运行与验证
 
