@@ -20,10 +20,10 @@ FLEET = {
     'aegis': dict(code='04', wing=4.8, length=.94, body=1.36, sweep=-.1, paint=(.45,.40,.29), accent=(.76,.21,.07), heavy=True),
     'nova': dict(code='05', wing=4.15, length=1.08, body=1.08, sweep=.2, paint=(.39,.40,.38), accent=(.68,.19,.08), cannon=True),
     'specter': dict(code='06', wing=5.2, length=.78, body=.85, sweep=-.8, paint=(.13,.17,.20), accent=(.34,.41,.44), stealth=True),
-    'grunt': dict(code='71', wing=3.55, length=.76, body=.76, sweep=.4, paint=(.33,.27,.22), accent=(.75,.16,.045), drone=True),
-    'kamikaze': dict(code='72', wing=2.7, length=1.06, body=.62, sweep=3.0, paint=(.28,.23,.20), accent=(.77,.25,.055), drone=True),
-    'elite': dict(code='81', wing=4.3, length=1.04, body=1.12, sweep=1.6, paint=(.27,.25,.24), accent=(.65,.10,.035), cannon=True, drone=True),
-    'super': dict(code='91', wing=5.15, length=1.16, body=1.48, sweep=-.6, paint=(.27,.29,.29), accent=(.62,.15,.04), heavy=True, quad=True, drone=True),
+    'grunt': dict(code='71', wing=3.55, length=.76, body=.76, sweep=.4, paint=(.070,.083,.105), accent=(.46,.016,.026), drone=True),
+    'kamikaze': dict(code='72', length=1, body=1, paint=(.055,.066,.082), accent=(.52,.019,.032), drone=True),
+    'elite': dict(code='81', wing=4.3, length=1.04, body=1.12, sweep=1.6, paint=(.060,.073,.090), accent=(.37,.012,.025), cannon=True, drone=True),
+    'super': dict(code='91', wing=5.15, length=1.16, body=1.48, sweep=-.6, paint=(.084,.092,.110), accent=(.42,.014,.024), heavy=True, quad=True, drone=True),
 }
 M = {}
 SOURCE = {}
@@ -38,7 +38,7 @@ def material(name, color, metal=.6, rough=.36, glow=0):
         bs.inputs['Emission Color'].default_value=(*color,1); bs.inputs['Emission Strength'].default_value=glow
     return mat
 
-def surface_finish(mat, color, kind):
+def surface_finish(mat, color, kind, roughness=.32):
     # 通过可打包的 PBR 数据贴图保留微小漆面变化，Blender 与 WebGL 读取同一结果。
     TEXTURE_DIR.mkdir(exist_ok=True)
     rng=np.random.default_rng(42); n=512
@@ -49,7 +49,7 @@ def surface_finish(mat, color, kind):
     modulation=.94+coarse*.045+noise*.015
     base=np.array(color)**(1/2.2)
     rgb=np.clip((base[None,None,:]*modulation[:,:,None]+scratches[:,:,None]*.045)*255,0,255).astype(np.uint8)
-    rough=np.clip(.32+coarse*.04+noise*.015+scratches*.08,0,1)
+    rough=np.clip(roughness+coarse*.04+noise*.015+scratches*.08,0,1)
     height=noise*.001+coarse*.006+scratches*.01
     dx=np.roll(height,1,1)-np.roll(height,-1,1); dy=np.roll(height,1,0)-np.roll(height,-1,0)
     normal=np.dstack((.5+dx,.5+dy,np.ones_like(dx)))
@@ -180,7 +180,8 @@ def wing(side,cfg):
         triangle=[inset[index] for index in indices]
         tx=sum(x for x,y in triangle)/3; ty=sum(y for x,y in triangle)/3
         panel=[(tx+(x-tx)*.92,ty+(y-ty)*.92) for x,y in triangle]
-        plate(f'分区蒙皮_{s}_{i}',panel,.202,.018,M['secondary'] if i==3 else M['paint'],.009)
+        surface=M['accent'] if cfg.get('drone') and i%2==0 else M['secondary'] if i==3 else M['paint']
+        plate(f'分区蒙皮_{s}_{i}',panel,.202,.018,surface,.009)
     # 前缘钛合金条与后缘襟翼以真实接缝分离。
     a,b=poly[1],poly[2]
     edge=[a,b,(b[0]-s*.05,b[1]-.09),(a[0]-s*.04,a[1]-.11)]
@@ -196,22 +197,13 @@ def wing(side,cfg):
     hatch=[(s*1.61,-.91,.216),(s*1.92,-1.05,.216),(s*2.09,-1.47,.216),(s*1.75,-1.40,.216),(s*1.61,-.91,.216)]
     seam('机翼液压检修盖',hatch,M['dark'],.012)
     for j in range(4): box('翼面散热槽',(s*2.15,-1.77-j*.07,.212),(.24,.016,.009),M['dark'],.002)
-    stencil('NO STEP',(s*2.76,-2.02+sweep*.30,.218),.075,M['mark'],'机翼维护标记')
+    stencil('AUTONOMOUS' if cfg.get('drone') else 'NO STEP',(s*2.76,-2.02+sweep*.30,.218),.075,M['mark'],'机翼维护标记')
     for x,y in [(1.75,-1.7),(2.05,-2.15),(1.25,.18),(w-.23,-2.18+sweep*.81)]:
         cylinder(f'翼板固定螺栓_{s}',(s*x,y,.226),.021,.01,M['metal'],axis='Z',vertices=8)
     # 航行灯嵌于翼尖，亮区保持很小。
     box(f'翼尖航行灯_{s}',(s*(w-.14),-2.34+sweep*.77,.18),(.055,.17,.07),M['nav'],.012)
 
-def engine(x,cfg,index):
-    w=.53*(1.12 if cfg.get('heavy') else 1)
-    loft(f'发动机短舱_{index}',[(1.3,w*.55,.32,0),(.65,w,.43,0),(-1.9,w,.44,0),(-3.0,w*.87,.36,0)],M['paint'])
-    # 短舱是独立建造的零件，平移到真实的发动机轴线。
-    obj=bpy.data.objects[f'发动机短舱_{index}']; obj.location.x=x
-    # 原组件位于新喷口之前，防止其内部栅片挡住后方重建的燃烧室与涡轮。
-    source_part('eng.Vanes',f'原件改造_涡轮壳_{index}',(x,-2.64,0),(w*1.7,.68,w*1.5),M['metal'])
-    cylinder(f'进气口_{index}',(x,1.28,0),w*.67,.07,M['dark'])
-    ring(f'进气口唇边_{index}',(x,1.27,0),w*.67,.035,M['metal'])
-    for j in range(5): box(f'进气栅_{index}_{j}',(x+(j-2)*w*.2,1.33,0),(.026,.025,w*.84),M['metal'],.006)
+def exhaust_nozzle(x,w,index):
     # 中空喷口的深度、收敛段、内衬、涡轮与外部可动瓣片共同形成真实机械层次。
     profile=[(-2.93,.64),(-3.14,.75),(-3.42,.81),(-3.67,.76),(-3.67,.66),(-3.39,.65),(-3.12,.47)]
     verts=[(x+math.cos(a*math.tau/64)*w*r,y,math.sin(a*math.tau/64)*w*r) for y,r in profile for a in range(64)]
@@ -233,6 +225,19 @@ def engine(x,cfg,index):
         blade.rotation_euler.y=-a+.35
         if j%3==0:
             seam(f'喷口液压连杆_{index}_{j}',[(x+math.cos(a)*w*.83,-2.91,math.sin(a)*w*.83),(x+math.cos(a)*w*.86,-3.32,math.sin(a)*w*.86)],M['metal'],.018)
+    empty=bpy.data.objects.new(f'exhaust_{index}',None); bpy.context.collection.objects.link(empty); empty.location=(x,-3.68,0); empty['radius']=w*.5
+
+def engine(x,cfg,index):
+    w=.53*(1.12 if cfg.get('heavy') else 1)
+    loft(f'发动机短舱_{index}',[(1.3,w*.55,.32,0),(.65,w,.43,0),(-1.9,w,.44,0),(-3.0,w*.87,.36,0)],M['paint'])
+    # 短舱是独立建造的零件，平移到真实的发动机轴线。
+    obj=bpy.data.objects[f'发动机短舱_{index}']; obj.location.x=x
+    # 原组件位于新喷口之前，防止其内部栅片挡住后方重建的燃烧室与涡轮。
+    source_part('eng.Vanes',f'原件改造_涡轮壳_{index}',(x,-2.64,0),(w*1.7,.68,w*1.5),M['metal'])
+    cylinder(f'进气口_{index}',(x,1.28,0),w*.67,.07,M['dark'])
+    ring(f'进气口唇边_{index}',(x,1.27,0),w*.67,.035,M['metal'])
+    for j in range(5): box(f'进气栅_{index}_{j}',(x+(j-2)*w*.2,1.33,0),(.026,.025,w*.84),M['metal'],.006)
+    exhaust_nozzle(x,w,index)
     for j in range(6): box(f'短舱散热鳍_{index}_{j}',(x,-1.2-j*.18,.455),(w*1.25,.055,.035),M['dark'],.005)
     for j in range(3):
         plate(f'发动机分段检修甲_{index}_{j}',[(x-w*.70,.48-j*.49),(x+w*.70,.48-j*.49),(x+w*.60,.08-j*.49),(x-w*.60,.08-j*.49)],.46,.07,M['secondary'],.025)
@@ -240,7 +245,6 @@ def engine(x,cfg,index):
             box('动力总成锁扣',(x+side*w*.58,.34-j*.49,.512),(.045,.12,.025),M['metal'],.008)
     for side in (-1,1):
         seam('燃油冷却管线',[(x+side*w*.82,.52,.23),(x+side*w*.96,.12,.25),(x+side*w*.96,-1.5,.25),(x+side*w*.78,-2,.23)],M['metal'],.021)
-    empty=bpy.data.objects.new(f'exhaust_{index}',None); bpy.context.collection.objects.link(empty); empty.location=(x,-3.68,0); empty['radius']=w*.5
 
 def flight_systems(cfg):
     """结构沿安装面分层，科幻细节集中在动力、传感与武器系统。"""
@@ -286,28 +290,97 @@ def flight_systems(cfg):
         plate('尾段热屏蔽肩甲',[(side*.25,-2.48),(side*.55,-2.53),(side*.68,-3.04),(side*.22,-3.10)],.30,.09,M['metal'],.02)
     stencil('CAUTION  /  ION DRIVE',(0,-2.29,.837),.064,M['mark'],'动力检修铭牌')
 
-def build(kind,source_root,destination):
-    global M,SOURCE
-    bpy.ops.wm.read_factory_settings(use_empty=True)
-    # 只引入实际使用的授权组件，其余模型不进入交付物。
-    with bpy.data.libraries.load(str(source_root/'Shipyard.blend'),link=False) as (a,b):
-        b.objects=['eng.Vanes','hardpoint.gun.bracket','ventPortBlock']
-    SOURCE={o.name:o for o in b.objects}
-    hidden=bpy.data.collections.new('CC0原件_制作参考'); bpy.context.scene.collection.children.link(hidden)
-    for o in SOURCE.values(): hidden.objects.link(o); o.hide_render=True; o.hide_set(True)
-    c=FLEET[kind]
-    M={'paint':material('主装甲_陶瓷金属涂层',tuple(v*.60 for v in c['paint']),.72,.30),
-       'secondary':material('次级装甲_深色钢',tuple(v*.54 for v in c['paint']),.65,.39),
-       'metal':material('拉丝钛合金',(.29,.32,.34),.88,.27),
-       'dark':material('碳化结构与接缝',(.018,.025,.028),.45,.4),
-       'accent':material('识别色',c['accent'],.4,.38),
-       'mark':material('丝印与编号',(.68,.71,.67),.25,.44),
-       'glass':material('镀膜座舱玻璃',(.012,.043,.055),.62,.085),
-       'engine':material('热喷口',(.98,.30,.035),.2,.3,3),
-       'nav':material('航行灯',(.55,.76,.83) if not c.get('drone') else (.9,.16,.045),.1,.24,2.5)}
-    surface_finish(M['paint'],tuple(v*.47 for v in c['paint']),kind)
-    M['glass'].node_tree.nodes.get('Principled BSDF').inputs['Coat Weight'].default_value=.85
-    b=c['body']; length=c['length']
+def hostile_identity(cfg):
+    """无人敌军以红黑装甲、三目传感器与矮背鳍建立独立的阵营识别。"""
+    b=cfg['body']
+    box('敌方三目传感器护罩',(0,2.10,.72),(.80*b,.26,.22),M['dark'],.045)
+    for i in [-1,0,1]:
+        x=i*.22*b
+        cylinder('敌方光电镜头外壳',(x,2.247,.74),.072,.045,M['metal'])
+        cylinder('敌方光电镀膜镜片',(x,2.275,.74),.052,.015,M['glass'])
+        cylinder('敌方红色光电核心',(x,2.286,.74),.026,.006,M['nav'],vertices=24)
+    for side in [-1,1]:
+        x=side*1.30*b
+        # 低矮后掠散热鳍替代玩家机的大面积垂尾，不引入座舱轮廓。
+        profile=[(-.72,.45),(-2.75,.36),(-2.38,1.09),(-1.40,.82)]
+        verts=[(x+side*(z-.36)*.40+dx,y,z) for dx in [-.065,.065] for y,z in profile]
+        mesh('敌方倾斜散热背鳍',verts,[(0,1,2,3),(4,7,6,5),(0,4,5,1),(1,5,6,2),(2,6,7,3),(3,7,4,0)],M['accent'],.024)
+        for j in range(3):
+            box('背鳍散热层',(x+side*.13,-1.28-j*.33,.63),(.25,.17,.045),M['metal'],.012)
+        # 机肩的红色识别甲沿原安装面放置，远距离俯视也能认出阵营。
+        plate('敌方肩部识别甲',[(side*.93*b,1.38),(side*(.93*b+.32),.65),(side*(.93*b+.28),-.32),(side*.93*b,-.12)],.59,.025,M['accent'],.012)
+        emblem_x=side*2.48
+        for dy,width in [(0,.42),(-.17,.32),(-.34,.22)]:
+            seam('敌军三齿徽记',[(emblem_x-side*width/2,-1.4+dy,.226),(emblem_x,-1.53+dy,.226),(emblem_x+side*width/2,-1.4+dy,.226)],M['mark'],.013)
+    stencil('UNIT / '+cfg['code'],(0,3.17,.476),.095,M['mark'],'无人编队编号')
+
+def build_kamikaze(cfg):
+    """专用三瓣冲撞无人机：中央弹体、径向装甲鳍和单轴主推进器。"""
+    loft('冲撞核心承力壳',[(3.6,.09,.11,0),(2.75,.60,.49,0),(1.65,1.04,.79,0),(.10,1.01,.78,0),(-1.45,.86,.71,0),(-2.99,.69,.65,0)],M['paint'],.045)
+    loft('前端贯穿装甲锥',[(3.72,.025,.045,0),(3.25,.27,.26,0),(2.50,.64,.54,0),(1.83,.92,.72,0)],M['secondary'],.035)
+    # 六瓣红色装甲围绕纵轴包覆，不复用战斗机的翼面、双短舱或航炮。
+    for j in range(6):
+        angle=j*math.tau/6
+        surface=M['accent'] if j%3!=2 else M['secondary']
+        stations=[(2.65,.66,.56),(1.65,1.065,.815),(.26,1.04,.805),(-.38,.955,.77)]
+        verts=[]
+        for depth in [1.07,1.15]:
+            for y,rx,rz in stations:
+                for a in [angle+.055,angle+math.tau/6-.055]:
+                    verts.append((math.cos(a)*rx*depth,y,math.sin(a)*rz*depth))
+        faces=[]
+        for k in range(3):
+            a=k*2
+            faces.extend([(a,a+2,a+3,a+1),(a+8,a+9,a+11,a+10),(a,a+8,a+10,a+2),(a+1,a+3,a+11,a+9)])
+        faces.extend([(0,1,9,8),(6,14,15,7)])
+        mesh(f'冲撞弹体红色包甲_{j}',verts,faces,surface,.018)
+        a=angle+math.pi/6
+        seam('弹体冷却缝',[(math.cos(a)*.92,-.60,math.sin(a)*.74),(math.cos(a)*.84,-1.5,math.sin(a)*.70),(math.cos(a)*.76,-2.30,math.sin(a)*.67)],M['metal'],.025)
+    # 三片径向折叠装甲鳍具有独立铰链与钛合金边缘，形成非传统战斗机剪影。
+    for j in range(3):
+        a=math.pi/2+j*math.tau/3
+        radial=Vector((math.cos(a),0,math.sin(a)))
+        tangent=Vector((-math.sin(a),0,math.cos(a)))
+        profile=[(.76,1.10),(1.95,1.96),(2.10,.82),(1.05,-1.55),(.76,-1.78)]
+        verts=[tuple(radial*r+Vector((0,y,0))+tangent*offset) for offset in [-.075,.075] for r,y in profile]
+        n=len(profile)
+        faces=[tuple(reversed(range(n))),tuple(range(n,2*n))]+[(k,(k+1)%n,(k+1)%n+n,k+n) for k in range(n)]
+        mesh(f'三瓣装甲鳍_{j}',verts,faces,M['secondary'],.03)
+        # 薄红色外覆板贴合两侧，中心保持深色机械骨架。
+        for side in [-1,1]:
+            outline=[(1.05,.85),(1.82,1.46),(1.92,.77),(1.17,-.92)]
+            vertices=[tuple(radial*r+Vector((0,y,0))+tangent*(side*.083)) for r,y in outline]
+            mesh(f'径向鳍红色覆板_{j}_{side}',vertices,[(0,1,2,3)],M['accent'],0)
+        seam('冲撞鳍钛合金刃缘',[tuple(radial*r+Vector((0,y,0))) for r,y in profile[1:4]],M['metal'],.025)
+        for y in [-.90,-.15,.60]:
+            center=radial*.86+Vector((0,y,0))
+            hinge=cylinder('径向鳍铰链',tuple(center),.115,.20,M['metal'])
+            hinge.rotation_euler=Vector((0,0,1)).rotation_difference(tangent).to_euler()
+            box('径向鳍安全锁',tuple(radial*.97+Vector((0,y,0))),(.10,.19,.10),M['accent'],.018)
+    # 前端只有环绕式测距窗口；无玻璃座舱、枪管或双垂尾。
+    for j in range(6):
+        a=j*math.tau/6+math.pi/6
+        p=Vector((math.cos(a)*.54,2.82,math.sin(a)*.46))
+        box('冲撞测距镜头基座',tuple(p),(.13,.18,.13),M['dark'],.027)
+        cylinder('冲撞测距镜片',(p.x,2.923,p.z),.052,.018,M['glass'],vertices=24)
+        cylinder('冲撞红色传感器',(p.x,2.937,p.z),.027,.009,M['nav'],vertices=24)
+    source_part('eng.Vanes','原件改造_中央推进器壳',(0,-2.63,0),(1.45,.60,1.38),M['metal'])
+    for j in range(8):
+        a=j*math.tau/8
+        p=(math.cos(a)*.80,-1.95,math.sin(a)*.70)
+        fin=box('中央推进器散热栅',p,(.13,.76,.065),M['metal'],.012)
+        fin.rotation_euler.y=-a
+    for side in [-1,1]:
+        for j in range(6):
+            y=-.85-j*.16
+            box('弹体后段冷却百叶',(side*.54,y,.817+y*.045),(.23,.065,.035),M['dark'],.005)
+            box('弹体冷却口压条',(side*.54,y+.035,.832+y*.045),(.23,.012,.019),M['metal'],.003)
+    exhaust_nozzle(0,1.08,0)
+    stencil('72',(0,-1.35,.753),.24,M['mark'],'冲撞无人机编号')
+    stencil('AUTONOMOUS',(0,-1.62,.744),.085,M['mark'],'冲撞无人机标记')
+
+def build_fighter(c):
+    b=c['body']
     loft('中央承力机身',[(5.35,.055,.07,-.03),(4.1,.32*b,.20,.01),(2.4,.70*b,.36,.08),(.3,1.0*b,.46,.08),(-2.15,.90*b,.37,.04),(-3.1,.64*b,.22,0)],M['dark'],.05)
     loft('机背连续装甲',[(4.8,.085,.08,.13),(3.25,.41*b,.20,.25),(1.5,.72*b,.28,.31),(-.3,.89*b,.31,.29),(-2.5,.62*b,.16,.26)],M['paint'],.045)
     # 侧肩护板与主壳保留装配缝。
@@ -326,7 +399,7 @@ def build(kind,source_root,destination):
     engine_positions=[-1.25*b,1.25*b]
     if c.get('quad'): engine_positions += [-2.35*b,2.35*b]
     for i,x in enumerate(engine_positions): engine(x,c,i)
-    if not c.get('stealth'):
+    if not c.get('stealth') and not c.get('drone'):
         for s in (-1,1):
             # 斜置垂尾用有厚度的多面体，侧面与正面都能识别。
             x=s*1.30*b
@@ -354,12 +427,47 @@ def build(kind,source_root,destination):
             plate('重型反应装甲',[(s*1.8,.55),(s*2.9,-.30),(s*3.35,-1.62),(s*1.8,-1.7)],.41,.19,M['secondary'])
             for j in range(3): box('模块化装甲板',(s*2.13,-.35-j*.37,.54),(.45,.28,.09),M['paint'],.025)
     # 顶面工业标记和检修口赋予可读尺度，不用随机装饰填满机体。
-    stencil('RESCUE',(0,3.24,.468),.105,M['accent'],'救援指示')
+    if not c.get('drone'): stencil('RESCUE',(0,3.24,.468),.105,M['accent'],'救援指示')
     for s in (-1,1):
         box('检修口边框',(s*.35,-2.05,.442),(.3,.36,.026),M['dark'],.025)
         box('检修口盖',(s*.35,-2.05,.458),(.265,.325,.018),M['secondary'],.015)
         for j in range(3): box('维修警示短线',(s*.35,-2.11+j*.06,.471),(.14,.012,.005),M['mark'],0)
     flight_systems(c)
+    if c.get('drone'): hostile_identity(c)
+
+def build(kind,source_root,destination):
+    global M,SOURCE
+    bpy.ops.wm.read_factory_settings(use_empty=True)
+    # 只引入实际使用的授权组件，其余模型不进入交付物。
+    with bpy.data.libraries.load(str(source_root/'Shipyard.blend'),link=False) as (a,b):
+        b.objects=['eng.Vanes','hardpoint.gun.bracket','ventPortBlock']
+    SOURCE={o.name:o for o in b.objects}
+    hidden=bpy.data.collections.new('CC0原件_制作参考'); bpy.context.scene.collection.children.link(hidden)
+    for o in SOURCE.values(): hidden.objects.link(o); o.hide_render=True; o.hide_set(True)
+    c=FLEET[kind]
+    hostile=c.get('drone',False)
+    M={'paint':material('主装甲_陶瓷金属涂层',tuple(v*.60 for v in c['paint']),.48 if hostile else .72,.42 if hostile else .30),
+       'secondary':material('次级装甲_深色钢',tuple(v*.54 for v in c['paint']),.65,.39),
+       'metal':material('拉丝钛合金',(.14,.16,.19) if hostile else (.29,.32,.34),.82 if hostile else .88,.34 if hostile else .27),
+       'dark':material('碳化结构与接缝',(.018,.025,.028),.45,.4),
+       'accent':material('识别色',c['accent'],.4,.38),
+       'mark':material('丝印与编号',(.68,.71,.67),.25,.44),
+       'glass':material('镀膜传感器玻璃' if hostile else '镀膜座舱玻璃',(.07,.005,.008) if hostile else (.012,.043,.055),.62,.085),
+       'engine':material('热喷口',(.98,.30,.035),.2,.3,3),
+       'nav':material('航行灯',(.9,.012,.018) if hostile else (.55,.76,.83),.1,.24,2.5)}
+    surface_finish(M['paint'],tuple(v*.47 for v in c['paint']),kind,.44 if hostile else .32)
+    M['glass'].node_tree.nodes.get('Principled BSDF').inputs['Coat Weight'].default_value=.85
+    if kind=='kamikaze': build_kamikaze(c)
+    else: build_fighter(c)
+    length=c['length']
+    # 先将各零件旋转烘焙进几何，再沿统一的机身纵轴缩放。
+    # 否则已旋转 90° 的喷口圆环会沿局部 Y（世界 Z）压扁，与外壳截面不一致。
+    parts=[o for o in bpy.context.scene.objects if o.type=='MESH' and not o.hide_render]
+    bpy.ops.object.select_all(action='DESELECT')
+    for o in parts: o.select_set(True)
+    bpy.context.view_layer.objects.active=parts[0]
+    bpy.ops.object.transform_apply(location=False,rotation=True,scale=True)
+    bpy.ops.object.select_all(action='DESELECT')
     for o in list(bpy.context.scene.objects):
         if o.name in SOURCE or o in hidden.objects.values(): continue
         if o.type=='MESH':
@@ -396,7 +504,7 @@ def build(kind,source_root,destination):
     bpy.ops.object.select_all(action='DESELECT')
     for o in scene.objects:
         if o.type in {'MESH','EMPTY'} and not o.hide_render: o.select_set(True)
-    bpy.ops.export_scene.gltf(filepath=str(destination/'raw'/f'{kind}.glb'),export_format='GLB',use_selection=True,export_apply=True)
+    bpy.ops.export_scene.gltf(filepath=str(destination/'raw'/f'{kind}.glb'),export_format='GLB',use_selection=True,export_apply=True,export_extras=True)
     print(f'制作完成 {kind}')
 
 if __name__=='__main__':

@@ -19,7 +19,7 @@
 ## 美术资产约定
 
 - `scripts/build_models.py` 使用 Greyoxide Shipyard CC0 机械组件并重新制作机身与 PBR 材质；`scripts/optimize_models.mjs` 输出 Meshopt 压缩 GLB，加载器使用本地解码器。
-- Blender 坐标 Z 向上、机首 +Y；GLB 坐标 Y 向上、机首 -Z。`exhaust_*` 空节点是喷口挂点，优化不能移除。
+- Blender 坐标 Z 向上、机首 +Y；GLB 坐标 Y 向上、机首 -Z。`exhaust_*` 空节点是喷口挂点，优化不能移除；数量由模型决定（自爆无人机 1 个，其余 2/4 个），挂点 `radius` 元数据用于尾焰宽度，导出须保留 extras。
 - 首页/机库/情报共用实时 3D 展示；斜视缩略图和俯视降级图由 `scripts/render_previews.py` 生成，禁止独立更换成不匹配的机体图片。
 - `render/hangarEnvironment.ts` 构建首页、机库和情报共用的 3D 舱室、地板、结构梁、舱门、行星与平面反射；所有物体共用世界坐标，地面 y=0、舱口位于 -Z。`frameHangarCamera` 按容器尺寸固定取景，加载和切机不得改变相机构图。
 - `render/hangarDetails.ts` 负责可重复的检修设施、机械件与标识图集，按几何/材质实例化并释放自身资源。展示通过 `ShipShowcase` 的 EffectComposer、GTAO（环境遮蔽）和 OutputPass 绘制；环境遮蔽按 CSS 分辨率计算，静止时不重复绘制，不进入战斗渲染链。
@@ -35,6 +35,7 @@
 - 类型检查：npx tsc --noEmit
 - 生产构建：npm run build
 - 浏览器验收：启动开发服务器后运行 npm run qa:browser；资产制作与授权见 `assets/model-sources/README.md`。
+- 模型几何验收：在安装 Blender Python API 的环境运行 `python scripts/qa_model_sources.py`，检查十类模型的喷口圆度、同轴关系和专用无人机结构。
 - 停放展示回归：启动开发服务器后运行 npm run qa:parking，检查高分屏画布、十种机型接地与拖动取景；包含延迟 GLB 下载的冷启动检查，结果默认保存在 `/private/tmp/super-thunder-hangar-3d/`。
 - 桌面端使用 WASD/方向键移动、空格/Enter 开火、1–3 切换机型、Esc 暂停；触屏端拖动战机并自动开火。
 

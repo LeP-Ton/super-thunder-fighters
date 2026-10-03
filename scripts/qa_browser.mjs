@@ -191,8 +191,21 @@ const bankAngles = await page.evaluate(async () => {
   testState.activePlaneId = "strider";
   testScene.render(testState, 1000 + 102 * 16.67);
   const switched = testScene.playerKind === "strider";
+  // 检查实际 GLB 挂点驱动的尾焰，防止单喷口模型仍出现双尾焰。
+  await testScene.loadModels();
+  const drone = testScene.makeShip("kamikaze", 40, true);
+  const nozzles = [];
+  drone.traverse((node) => {
+    if (node.name.startsWith("exhaust_"))
+      nozzles.push({
+        radius: node.userData.radius,
+        flameCount: node.children.filter((child) => child.isMesh).length,
+        flameWidth: node.children[0]?.scale.x,
+      });
+  });
+  testScene.scene.remove(drone);
   testScene.dispose();
-  return { right, left, centered, switched };
+  return { right, left, centered, switched, nozzles };
 });
 const combatSmoke = await page.evaluate(async () => {
   const { updateGame } = await import("/game/engine.ts");
@@ -331,7 +344,12 @@ if (
   assetStructure.some(
     (item) =>
       item.meshes < 8 ||
-      item.sockets !== (["tempest", "super"].includes(item.kind) ? 4 : 2),
+      item.sockets !==
+        (item.kind === "kamikaze"
+          ? 1
+          : ["tempest", "super"].includes(item.kind)
+            ? 4
+            : 2),
   ) ||
   mobileOverflow ||
   !removed ||
@@ -339,6 +357,10 @@ if (
   inspected.length !== 6 ||
   inspectedEnemies.length !== 4 ||
   fps < 50 ||
+  bankAngles.nozzles.length !== 1 ||
+  bankAngles.nozzles[0]?.flameCount !== 1 ||
+  !(bankAngles.nozzles[0]?.radius > 0.5) ||
+  !(bankAngles.nozzles[0]?.flameWidth > 0.38) ||
   !paused ||
   !resumed ||
   title !== "超级雷霆战机" ||

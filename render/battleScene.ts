@@ -287,7 +287,9 @@ export class BattleScene {
         );
         flame.rotation.x = Math.PI / 2;
         flame.position.z = 0.7;
-        flame.scale.set(0.2, 1.4, 0.2);
+        // 挂点携带实际喷口半径，单推进器无人机也能获得匹配的尾焰宽度。
+        const radius = Math.max(0.12, Number(socket.userData.radius) || 0.265);
+        flame.scale.set(radius * 0.75, 1.4, radius * 0.75);
         socket.add(flame);
       }
     } else {

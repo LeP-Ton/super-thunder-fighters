@@ -1,0 +1,407 @@
+[
+  {
+    "kind": "aegis",
+    "sockets": 2,
+    "rings": [
+      {
+        "part": "喷口支承环_0",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "喷口唇口_0",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "燃烧室热环_0",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "喷口支承环_1",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "喷口唇口_1",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "燃烧室热环_1",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      }
+    ]
+  },
+  {
+    "kind": "elite",
+    "sockets": 2,
+    "rings": [
+      {
+        "part": "喷口支承环_0",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "喷口唇口_0",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "燃烧室热环_0",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "喷口支承环_1",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "喷口唇口_1",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "燃烧室热环_1",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      }
+    ]
+  },
+  {
+    "kind": "grunt",
+    "sockets": 2,
+    "rings": [
+      {
+        "part": "喷口支承环_0",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "喷口唇口_0",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "燃烧室热环_0",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "喷口支承环_1",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "喷口唇口_1",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "燃烧室热环_1",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      }
+    ]
+  },
+  {
+    "kind": "kamikaze",
+    "sockets": 1,
+    "rings": [
+      {
+        "part": "喷口支承环_0",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "喷口唇口_0",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "燃烧室热环_0",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      }
+    ]
+  },
+  {
+    "kind": "nova",
+    "sockets": 2,
+    "rings": [
+      {
+        "part": "喷口支承环_0",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "喷口唇口_0",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "燃烧室热环_0",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "喷口支承环_1",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "喷口唇口_1",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "燃烧室热环_1",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      }
+    ]
+  },
+  {
+    "kind": "specter",
+    "sockets": 2,
+    "rings": [
+      {
+        "part": "喷口支承环_0",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "喷口唇口_0",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "燃烧室热环_0",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "喷口支承环_1",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "喷口唇口_1",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "燃烧室热环_1",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      }
+    ]
+  },
+  {
+    "kind": "strider",
+    "sockets": 2,
+    "rings": [
+      {
+        "part": "喷口支承环_0",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "喷口唇口_0",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "燃烧室热环_0",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "喷口支承环_1",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "喷口唇口_1",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "燃烧室热环_1",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      }
+    ]
+  },
+  {
+    "kind": "super",
+    "sockets": 4,
+    "rings": [
+      {
+        "part": "喷口支承环_0",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "喷口唇口_0",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "燃烧室热环_0",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "喷口支承环_1",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "喷口唇口_1",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "燃烧室热环_1",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "喷口支承环_2",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "喷口唇口_2",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "燃烧室热环_2",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "喷口支承环_3",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "喷口唇口_3",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "燃烧室热环_3",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      }
+    ]
+  },
+  {
+    "kind": "tempest",
+    "sockets": 4,
+    "rings": [
+      {
+        "part": "喷口支承环_0",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "喷口唇口_0",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "燃烧室热环_0",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "喷口支承环_1",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "喷口唇口_1",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "燃烧室热环_1",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "喷口支承环_2",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "喷口唇口_2",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "燃烧室热环_2",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "喷口支承环_3",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "喷口唇口_3",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "燃烧室热环_3",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      }
+    ]
+  },
+  {
+    "kind": "vanguard",
+    "sockets": 2,
+    "rings": [
+      {
+        "part": "喷口支承环_0",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "喷口唇口_0",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "燃烧室热环_0",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "喷口支承环_1",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "喷口唇口_1",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      },
+      {
+        "part": "燃烧室热环_1",
+        "widthHeightRatio": 1.0,
+        "axisError": 0.0
+      }
+    ]
+  }
+]
