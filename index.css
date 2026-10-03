@@ -315,10 +315,10 @@ img {
 }
 .hero-model {
   position: absolute;
-  left: 26%;
-  right: -5%;
-  top: 1%;
-  height: 76%;
+  left: 36%;
+  right: 5%;
+  top: 31%;
+  height: 56%;
   z-index: 1;
   pointer-events: none;
 }
@@ -1345,9 +1345,9 @@ img {
     margin-top: 6vh;
   }
   .hero-model {
-    height: 78%;
-    left: 28%;
-    right: -2%;
+    height: 56%;
+    left: 36%;
+    right: 5%;
   }
   .home-bottom {
     bottom: 60px;
@@ -1377,10 +1377,10 @@ img {
     font-size: 12px;
   }
   .hero-model {
-    left: 29%;
-    right: -16%;
-    height: 72%;
-    top: 2%;
+    left: 35%;
+    right: 0;
+    height: 54%;
+    top: 28%;
   }
   .hero-aircraft-label {
     bottom: 30%;
@@ -1460,9 +1460,9 @@ img {
     min-height: 55px;
   }
   .hero-model {
-    left: 31%;
-    right: -18%;
-    top: 6%;
+    left: 36%;
+    right: 0;
+    top: 29%;
   }
   .hero-aircraft-label {
     bottom: 30%;
@@ -1573,7 +1573,7 @@ img {
   }
   .hangar-backdrop {
     background-position: 62% center;
-    inset: -76px 0 -36px;
+    inset: -76px 0 16svh;
   }
   .hero-copy {
     width: 100%;
@@ -1596,10 +1596,10 @@ img {
     line-height: 1.8;
   }
   .hero-model {
-    left: -9%;
-    right: -20%;
-    top: 21%;
-    height: 45%;
+    left: 0;
+    right: 0;
+    top: 26%;
+    height: 37%;
     pointer-events: none;
   }
   .hero-aircraft-label {
@@ -1955,8 +1955,8 @@ img {
     height: 76px;
   }
   .hero-model {
-    top: -3%;
-    height: 80%;
+    top: 27%;
+    height: 57%;
   }
   .home-location {
     bottom: 40px;

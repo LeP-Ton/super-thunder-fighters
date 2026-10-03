@@ -1,0 +1,456 @@
+{
+  "dimensions": [
+    {
+      "selector": ".hero-model",
+      "viewport": [
+        1511,
+        818
+      ],
+      "dpr": 1,
+      "host": [
+        891.5,
+        375.1875
+      ],
+      "canvas": [
+        891.5,
+        375.1875
+      ],
+      "buffer": [
+        891,
+        375
+      ],
+      "overflow": false
+    },
+    {
+      "selector": ".hero-model",
+      "viewport": [
+        1511,
+        818
+      ],
+      "dpr": 1.25,
+      "host": [
+        891.5,
+        375.1875
+      ],
+      "canvas": [
+        891.5,
+        375.1875
+      ],
+      "buffer": [
+        1114,
+        468
+      ],
+      "overflow": false
+    },
+    {
+      "selector": ".hero-model",
+      "viewport": [
+        1511,
+        818
+      ],
+      "dpr": 1.75,
+      "host": [
+        891.5,
+        375.1875
+      ],
+      "canvas": [
+        891.5,
+        375.1875
+      ],
+      "buffer": [
+        1560,
+        656
+      ],
+      "overflow": false
+    },
+    {
+      "selector": ".hero-model",
+      "viewport": [
+        1511,
+        818
+      ],
+      "dpr": 2,
+      "host": [
+        891.5,
+        375.1875
+      ],
+      "canvas": [
+        891.5,
+        375.1875
+      ],
+      "buffer": [
+        1560,
+        656
+      ],
+      "overflow": false
+    },
+    {
+      "selector": ".hero-model",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "dpr": 2,
+      "host": [
+        1132.8125,
+        521.90625
+      ],
+      "canvas": [
+        1132.8125,
+        521.90625
+      ],
+      "buffer": [
+        1982,
+        913
+      ],
+      "overflow": false
+    },
+    {
+      "selector": ".hero-model",
+      "viewport": [
+        1280,
+        720
+      ],
+      "dpr": 2,
+      "host": [
+        755.203125,
+        343.125
+      ],
+      "canvas": [
+        755.203125,
+        343.125
+      ],
+      "buffer": [
+        1321,
+        600
+      ],
+      "overflow": false
+    },
+    {
+      "selector": ".hero-model",
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 3,
+      "host": [
+        390,
+        270.828125
+      ],
+      "canvas": [
+        390,
+        270.828125
+      ],
+      "buffer": [
+        682,
+        473
+      ],
+      "overflow": false
+    },
+    {
+      "selector": ".hangar-panel",
+      "viewport": [
+        1511,
+        818
+      ],
+      "dpr": 2,
+      "host": [
+        788,
+        459
+      ],
+      "canvas": [
+        788,
+        459
+      ],
+      "buffer": [
+        1379,
+        803
+      ],
+      "overflow": false
+    },
+    {
+      "selector": ".hangar-panel",
+      "viewport": [
+        1511,
+        818
+      ],
+      "dpr": 2,
+      "host": [
+        788,
+        459
+      ],
+      "canvas": [
+        788,
+        459
+      ],
+      "buffer": [
+        1379,
+        803
+      ],
+      "overflow": false
+    },
+    {
+      "selector": ".hangar-panel",
+      "viewport": [
+        1511,
+        818
+      ],
+      "dpr": 2,
+      "host": [
+        788,
+        459
+      ],
+      "canvas": [
+        788,
+        459
+      ],
+      "buffer": [
+        1379,
+        803
+      ],
+      "overflow": false
+    },
+    {
+      "selector": ".hangar-panel",
+      "viewport": [
+        1511,
+        818
+      ],
+      "dpr": 2,
+      "host": [
+        788,
+        459
+      ],
+      "canvas": [
+        788,
+        459
+      ],
+      "buffer": [
+        1379,
+        803
+      ],
+      "overflow": false
+    },
+    {
+      "selector": ".hangar-panel",
+      "viewport": [
+        1511,
+        818
+      ],
+      "dpr": 2,
+      "host": [
+        788,
+        459
+      ],
+      "canvas": [
+        788,
+        459
+      ],
+      "buffer": [
+        1379,
+        803
+      ],
+      "overflow": false
+    },
+    {
+      "selector": ".hangar-panel",
+      "viewport": [
+        1511,
+        818
+      ],
+      "dpr": 2,
+      "host": [
+        788,
+        459
+      ],
+      "canvas": [
+        788,
+        459
+      ],
+      "buffer": [
+        1379,
+        803
+      ],
+      "overflow": false
+    },
+    {
+      "selector": ".intel-panel",
+      "viewport": [
+        1511,
+        818
+      ],
+      "dpr": 2,
+      "host": [
+        788,
+        423.1875
+      ],
+      "canvas": [
+        788,
+        423.1875
+      ],
+      "buffer": [
+        1379,
+        740
+      ],
+      "overflow": false
+    },
+    {
+      "selector": ".intel-panel",
+      "viewport": [
+        1511,
+        818
+      ],
+      "dpr": 2,
+      "host": [
+        788,
+        423.1875
+      ],
+      "canvas": [
+        788,
+        423.1875
+      ],
+      "buffer": [
+        1379,
+        740
+      ],
+      "overflow": false
+    },
+    {
+      "selector": ".intel-panel",
+      "viewport": [
+        1511,
+        818
+      ],
+      "dpr": 2,
+      "host": [
+        788,
+        423.1875
+      ],
+      "canvas": [
+        788,
+        423.1875
+      ],
+      "buffer": [
+        1379,
+        740
+      ],
+      "overflow": false
+    },
+    {
+      "selector": ".intel-panel",
+      "viewport": [
+        1511,
+        818
+      ],
+      "dpr": 2,
+      "host": [
+        788,
+        423.1875
+      ],
+      "canvas": [
+        788,
+        423.1875
+      ],
+      "buffer": [
+        1379,
+        740
+      ],
+      "overflow": false
+    }
+  ],
+  "models": [
+    {
+      "kind": "vanguard",
+      "vertices": 45602,
+      "outlineVertices": 288,
+      "floor": -5.960464483090178e-9,
+      "maxProjected": 0.8200000000000022,
+      "cases": 12
+    },
+    {
+      "kind": "strider",
+      "vertices": 45911,
+      "outlineVertices": 269,
+      "floor": -5.960464483090178e-9,
+      "maxProjected": 0.8200000000000005,
+      "cases": 12
+    },
+    {
+      "kind": "tempest",
+      "vertices": 69754,
+      "outlineVertices": 298,
+      "floor": -5.960464483090178e-9,
+      "maxProjected": 0.820000000000001,
+      "cases": 12
+    },
+    {
+      "kind": "aegis",
+      "vertices": 47729,
+      "outlineVertices": 283,
+      "floor": -5.960464483090178e-9,
+      "maxProjected": 0.820000000000002,
+      "cases": 12
+    },
+    {
+      "kind": "nova",
+      "vertices": 46700,
+      "outlineVertices": 293,
+      "floor": -5.960464483090178e-9,
+      "maxProjected": 0.8200000000000011,
+      "cases": 12
+    },
+    {
+      "kind": "specter",
+      "vertices": 45511,
+      "outlineVertices": 246,
+      "floor": -5.960464483090178e-9,
+      "maxProjected": 0.8200000000000018,
+      "cases": 12
+    },
+    {
+      "kind": "grunt",
+      "vertices": 45798,
+      "outlineVertices": 267,
+      "floor": -5.960464483090178e-9,
+      "maxProjected": 0.8200000000000023,
+      "cases": 12
+    },
+    {
+      "kind": "kamikaze",
+      "vertices": 45117,
+      "outlineVertices": 298,
+      "floor": -5.960464483090178e-9,
+      "maxProjected": 0.8200000000000011,
+      "cases": 12
+    },
+    {
+      "kind": "elite",
+      "vertices": 46781,
+      "outlineVertices": 289,
+      "floor": -5.960464483090178e-9,
+      "maxProjected": 0.820000000000002,
+      "cases": 12
+    },
+    {
+      "kind": "super",
+      "vertices": 70456,
+      "outlineVertices": 320,
+      "floor": -5.960464483090178e-9,
+      "maxProjected": 0.8200000000000016,
+      "cases": 12
+    }
+  ],
+  "selections": [
+    "先锋号",
+    "迅影",
+    "风暴",
+    "盾卫",
+    "新星",
+    "幽影",
+    "集群拦截机",
+    "自爆无人机",
+    "精英攻击机",
+    "超级战斗机"
+  ],
+  "errors": []
+}
