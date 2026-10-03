@@ -4,6 +4,8 @@ import { instantiateShip, ShipAsset } from "./modelLibrary";
 /** 起落架与机位标线仅用于停放展示，不进入战斗模型或碰撞计算。 */
 export function createParkedDisplay(asset: ShipAsset) {
   const aircraft = new THREE.Group();
+  const landingGear = new THREE.Group();
+  aircraft.add(landingGear);
   const markings = new THREE.Group();
   const geometries = new Set<THREE.BufferGeometry>();
   const materials = new Set<THREE.Material>();
@@ -83,7 +85,7 @@ export function createParkedDisplay(asset: ShipAsset) {
       direction.normalize(),
     );
     mesh.castShadow = true;
-    aircraft.add(mesh);
+    landingGear.add(mesh);
   };
 
   const gearLocations = [
@@ -110,13 +112,13 @@ export function createParkedDisplay(asset: ShipAsset) {
       wheel.position.copy(axle).add(new THREE.Vector3(side * 0.08, 0, 0));
       wheel.castShadow = true;
       wheel.receiveShadow = true;
-      aircraft.add(wheel);
+      landingGear.add(wheel);
     }
     const hub = new THREE.Mesh(hubGeometry, metal);
     hub.rotation.z = Math.PI / 2;
     hub.position.copy(axle);
     hub.castShadow = true;
-    aircraft.add(hub);
+    landingGear.add(hub);
   });
   aircraft.rotation.y = 0;
 
@@ -143,10 +145,55 @@ export function createParkedDisplay(asset: ShipAsset) {
   stripe(0, -halfLength + 0.45, 0.035, 0.85);
   stripe(0, -halfLength, 0.85, 0.035);
 
+  const flames: Array<{ mesh: THREE.Mesh; radius: number }> = [];
+  let flameMaterial: THREE.MeshBasicMaterial | undefined;
+  const setFlightState = (retraction: number, throttle: number) => {
+    landingGear.visible = retraction < 0.98;
+    landingGear.scale.y = 1 - retraction * 0.9;
+    landingGear.position.y = retraction * 0.48;
+    if (throttle > 0 && !flameMaterial) {
+      // 仅出舱时生成展示尾焰；停放边界与战斗共享模型均不受影响。
+      const geometry = new THREE.ConeGeometry(1, 1, 24, 1, true);
+      flameMaterial = new THREE.MeshBasicMaterial({
+        color: "#8bdcff",
+        transparent: true,
+        opacity: 0,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        toneMapped: false,
+        side: THREE.DoubleSide,
+      });
+      geometries.add(geometry);
+      materials.add(flameMaterial);
+      const sockets: THREE.Object3D[] = [];
+      ship.traverse((node) => {
+        if (node.name.startsWith("exhaust_")) sockets.push(node);
+      });
+      for (const socket of sockets) {
+        const mesh = new THREE.Mesh(geometry, flameMaterial);
+        mesh.rotation.x = Math.PI / 2;
+        socket.add(mesh);
+        flames.push({ mesh, radius: Number(socket.userData.radius) || 0.265 });
+      }
+    }
+    if (flameMaterial) flameMaterial.opacity = throttle * 0.78;
+    for (const { mesh, radius } of flames) {
+      const length = 0.5 + throttle * 3.4;
+      mesh.visible = throttle > 0.01;
+      mesh.scale.set(radius * 0.82, length, radius * 0.82);
+      mesh.position.z = length * 0.5;
+    }
+    parkedMaterials.forEach((material) => {
+      (material as THREE.MeshStandardMaterial).emissiveIntensity =
+        0.12 + throttle * 2;
+    });
+  };
+
   return {
     aircraft,
     markings,
     bounds: parkingBounds,
+    setFlightState,
     dispose() {
       geometries.forEach((geometry) => geometry.dispose());
       materials.forEach((material) => material.dispose());

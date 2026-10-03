@@ -8,7 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "qa:browser": "node scripts/qa_browser.mjs",
-    "qa:parking": "node scripts/qa_parking.mjs"
+    "qa:parking": "node scripts/qa_parking.mjs",
+    "qa:hangar-motion": "node scripts/qa_hangar_motion.mjs"
   },
   "dependencies": {
     "@google/genai": "^1.39.0",

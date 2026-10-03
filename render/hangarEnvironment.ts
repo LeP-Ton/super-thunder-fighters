@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { Reflector } from "three/addons/objects/Reflector.js";
 import { RectAreaLightUniformsLib } from "three/addons/lights/RectAreaLightUniformsLib.js";
 import { createHangarDetails } from "./hangarDetails";
+import { createHangarTraffic } from "./hangarTraffic";
 
 /** 机库与战机共享世界坐标：地面 y=0，舱门位于 -Z，默认机首朝舱外。 */
 export function createHangarEnvironment(invalidate: () => void) {
@@ -141,6 +142,12 @@ export function createHangarEnvironment(invalidate: () => void) {
   });
   reflection.rotation.x = -Math.PI / 2;
   reflection.position.set(0, 0.004, 1);
+  const renderReflection = reflection.onBeforeRender;
+  reflection.onBeforeRender = function (...args) {
+    // AO 法线预通道无需再次计算整舱反射，避免每帧重复渲染模型和检修设施。
+    if (args[1].overrideMaterial) return;
+    renderReflection.apply(this, args);
+  };
   const reflectionMaterial = reflection.material as THREE.ShaderMaterial;
   reflectionMaterial.transparent = true;
   reflectionMaterial.depthWrite = false;
@@ -255,6 +262,9 @@ export function createHangarEnvironment(invalidate: () => void) {
 
   const details = createHangarDetails();
   group.add(details.group);
+  const traffic = createHangarTraffic(invalidate);
+  group.add(traffic.group);
+  let serviceClearance = 0;
 
   const outside = new THREE.Group();
   group.add(outside);
@@ -332,9 +342,25 @@ export function createHangarEnvironment(invalidate: () => void) {
 
   return {
     group,
+    update(
+      time: number,
+      delta: number,
+      clearLane: boolean,
+      reducedMotion: boolean,
+    ) {
+      serviceClearance = reducedMotion
+        ? clearLane
+          ? 1
+          : 0
+        : THREE.MathUtils.damp(serviceClearance, clearLane ? 1 : 0, 5, delta);
+      details.update(reducedMotion ? 0 : time, serviceClearance);
+      traffic.update(time, !reducedMotion);
+      return !reducedMotion;
+    },
     dispose() {
       disposed = true;
       details.dispose();
+      traffic.dispose();
       group.children.forEach((child) => {
         if (child instanceof THREE.InstancedMesh) child.dispose();
       });

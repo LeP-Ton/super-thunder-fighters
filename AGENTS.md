@@ -22,9 +22,10 @@
 - Blender 坐标 Z 向上、机首 +Y；GLB 坐标 Y 向上、机首 -Z。`exhaust_*` 空节点是喷口挂点，优化不能移除；数量由模型决定（自爆无人机 1 个，其余 2/4 个），挂点 `radius` 元数据用于尾焰宽度，导出须保留 extras。
 - 首页/机库/情报共用实时 3D 展示；斜视缩略图和俯视降级图由 `scripts/render_previews.py` 生成，禁止独立更换成不匹配的机体图片。
 - `render/hangarEnvironment.ts` 构建首页、机库和情报共用的 3D 舱室、地板、结构梁、舱门、行星与平面反射；所有物体共用世界坐标，地面 y=0、舱口位于 -Z。`frameHangarCamera` 按容器尺寸固定取景，加载和切机不得改变相机构图。
-- `render/hangarDetails.ts` 负责可重复的检修设施、机械件与标识图集，按几何/材质实例化并释放自身资源。展示通过 `ShipShowcase` 的 EffectComposer、GTAO（环境遮蔽）和 OutputPass 绘制；环境遮蔽按 CSS 分辨率计算，静止时不重复绘制，不进入战斗渲染链。
+- `render/hangarDetails.ts` 负责检修设施、关节机械臂与标识图集；静态零件及每段刚性连杆按几何/材质实例化。`render/hangarTraffic.ts` 复用共享 GLB 构建舱外巡航，不进入战斗。展示通过 EffectComposer、GTAO（环境遮蔽）和 OutputPass 绘制；遮蔽单独降采样，阴影每帧更新一次，法线预通道不重复计算反射。
 - `render/parkedDisplay.ts` 仅负责展示用起落架、机位标线与停放材质；不能改变战斗模型或碰撞。机首默认朝 -Z，检视时只旋转机体。展示材质有变化时必须克隆，禁止修改共享模型材质。
-- `ShipShowcase` 将场景生命周期与机型加载分离，切机复用场景和画布；冷启动直接显示 3D 舱室，静态模型预览仅用于 WebGL 不可用或模型失败的降级。
+- `ShipShowcase` 将场景生命周期与机型加载分离，切机复用场景和画布；`render/hangarTransfer.ts` 管理回正、出舱、滑入与连续改选，目标资源就绪才允许离场。冷启动原位添加首架战机，静态预览仅用于 WebGL 不可用或首架模型失败的降级。
+- 展示用活动时钟驱动机械臂、巡航和切机；页面隐藏或展示被遮挡时暂停。环境动作限制为 30 FPS，切机/拖动按浏览器刷新率绘制；遵循 `prefers-reduced-motion`，减弱动态时关闭环境动作并直接切机。所有展示动画与游戏固定时间步分离。
 - 展示 Canvas 的 CSS 尺寸必须与 DPR（设备像素比）渲染缓冲区分离；取景按容器尺寸统一计算，验收需覆盖高分屏与跨屏 DPR 变化。
 - 场景位于 `public/assets/environments/`；模型来源与制作步骤见 `assets/model-sources/README.md`，生成场景提示词见场景目录 README。
 
@@ -37,6 +38,7 @@
 - 浏览器验收：启动开发服务器后运行 npm run qa:browser；资产制作与授权见 `assets/model-sources/README.md`。
 - 模型几何验收：在安装 Blender Python API 的环境运行 `python scripts/qa_model_sources.py`，检查十类模型的喷口圆度、同轴关系和专用无人机结构。
 - 停放展示回归：启动开发服务器后运行 npm run qa:parking，检查高分屏画布、十种机型接地与拖动取景；包含延迟 GLB 下载的冷启动检查，结果默认保存在 `/private/tmp/super-thunder-hangar-3d/`。
+- 动态机库验收：npm run qa:hangar-motion，检查出舱路径、地面滑入、连续改选、机械臂/巡航、遮挡暂停、减弱动态和共享资源释放，并保存实际 WebM 演示。
 - 桌面端使用 WASD/方向键移动、空格/Enter 开火、1–3 切换机型、Esc 暂停；触屏端拖动战机并自动开火。
 
 ## 开发规范与检索

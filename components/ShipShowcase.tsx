@@ -6,7 +6,7 @@ import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
 import { GTAOPass } from "three/addons/postprocessing/GTAOPass.js";
 import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
 import { loadShipAsset } from "../render/modelLibrary";
-import { createParkedDisplay } from "../render/parkedDisplay";
+import { HangarTransfer } from "../render/hangarTransfer";
 import {
   createHangarEnvironment,
   frameHangarCamera,
@@ -58,7 +58,6 @@ export const ShipShowcase: React.FC<ShipShowcaseProps> = ({
     let disposed = false;
     let frame = 0;
     let needsRender = true;
-    let parkedDisplay: ReturnType<typeof createParkedDisplay> | undefined;
     const scene = new THREE.Scene();
     scene.fog = new THREE.FogExp2("#16202a", 0.009);
     const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 500);
@@ -67,6 +66,8 @@ export const ShipShowcase: React.FC<ShipShowcaseProps> = ({
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 0.94;
     renderer.shadowMap.enabled = true;
+    // 合成链会多次绘制场景；阴影每个展示帧只更新一次。
+    renderer.shadowMap.autoUpdate = false;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.domElement.setAttribute("aria-hidden", "true");
     renderer.domElement.style.width = "100%";
@@ -86,12 +87,23 @@ export const ShipShowcase: React.FC<ShipShowcaseProps> = ({
       needsRender = true;
     });
     scene.add(hangar.group);
-    const turntable = new THREE.Group();
-    scene.add(turntable);
-    // 环境遮蔽补足装甲接缝、机械关节和接地点；只用于按需绘制的展示场景。
+    const transfer = new HangarTransfer(() => {
+      host.dataset.phase = transfer.phase;
+      host.dataset.shipKind = transfer.currentKind ?? "";
+      setReady(transfer.ready);
+      needsRender = true;
+    });
+    scene.add(transfer.group);
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const motionChanged = () => {
+      if (reducedMotion.matches) transfer.finishImmediately();
+      needsRender = true;
+    };
+    reducedMotion.addEventListener("change", motionChanged);
+    // 环境遮蔽只用于展示；环境动作限帧，切机与拖动保持完整刷新率。
     const target = new THREE.WebGLRenderTarget(1, 1, {
       type: THREE.HalfFloatType,
-      samples: 4,
+      samples: 2,
     });
     const composer = new EffectComposer(renderer, target);
     const renderPass = new RenderPass(scene, camera);
@@ -109,14 +121,17 @@ export const ShipShowcase: React.FC<ShipShowcaseProps> = ({
     composer.addPass(renderPass);
     composer.addPass(ao);
     composer.addPass(output);
-    let rotation = 0;
-    let targetRotation = 0;
+    const draw = () => {
+      renderer.shadowMap.needsUpdate = true;
+      composer.render();
+    };
     let pointer: { id: number; x: number } | undefined;
     const canvas = renderer.domElement;
     canvas.style.cursor = interactive ? "grab" : "default";
     const pointerDown = (event: PointerEvent) => {
       if (
         !interactive ||
+        !transfer.ready ||
         pointer ||
         (event.pointerType === "mouse" && event.button !== 0)
       )
@@ -127,10 +142,11 @@ export const ShipShowcase: React.FC<ShipShowcaseProps> = ({
     };
     const pointerMove = (event: PointerEvent) => {
       if (pointer?.id !== event.pointerId) return;
-      targetRotation +=
+      transfer.rotateBy(
         ((event.clientX - pointer.x) / Math.max(host.clientWidth, 1)) *
-        Math.PI *
-        2;
+          Math.PI *
+          2,
+      );
       pointer.x = event.clientX;
     };
     const pointerUp = (event: PointerEvent) => {
@@ -155,8 +171,11 @@ export const ShipShowcase: React.FC<ShipShowcaseProps> = ({
       renderer.setSize(width, height, false);
       composer.setPixelRatio(renderer.getPixelRatio());
       composer.setSize(width, height);
-      // AO 使用 CSS 分辨率，主体与轮廓仍按高分屏分辨率渲染。
-      ao.setSize(Math.round(width), Math.round(height));
+      // 遮蔽为柔和接缝效果，使用较低分辨率；机体轮廓与材质保持完整高分屏像素。
+      ao.setSize(
+        Math.max(1, Math.round(width * 0.65)),
+        Math.max(1, Math.round(height * 0.65)),
+      );
       needsRender = true;
     };
     const observer = new ResizeObserver(resize);
@@ -164,37 +183,32 @@ export const ShipShowcase: React.FC<ShipShowcaseProps> = ({
     window.addEventListener("resize", resize);
     resize();
 
-    // 新模型就绪后原位替换；加载时保留当前 3D 场景，不插入另一机位的缩略图。
+    // 等待目标资源就绪再交接；代次保护防止较慢请求覆盖最后一次选择。
     let generation = 0;
     loadRef.current = (nextKind) => {
       const request = ++generation;
+      transfer.request(nextKind);
       setReady(false);
       setUnavailable(false);
+      delete host.dataset.loadError;
       loadShipAsset(nextKind)
         .then((asset) => {
           if (disposed || request !== generation) return;
-          const next = createParkedDisplay(asset);
-          if (parkedDisplay) {
-            turntable.remove(parkedDisplay.aircraft);
-            scene.remove(parkedDisplay.markings);
-            parkedDisplay.dispose();
-          }
-          parkedDisplay = next;
-          turntable.add(next.aircraft);
-          scene.add(next.markings);
-          rotation = targetRotation = 0;
-          turntable.rotation.y = 0;
-          composer.render();
-          needsRender = false;
-          setReady(true);
+          transfer.prepare(nextKind, asset, reducedMotion.matches);
         })
         .catch(() => {
-          if (!disposed && request === generation) setUnavailable(true);
+          if (!disposed && request === generation) {
+            // 已有机体时保持原机位，失败的加载不能触发离场或清空机库。
+            if (!transfer.currentKind) setUnavailable(true);
+            host.dataset.loadError = nextKind;
+          }
         });
     };
-    composer.render();
+    draw();
 
     let previous = performance.now();
+    let elapsed = 0;
+    let lastRender = 0;
     const animate = (now: number) => {
       frame = requestAnimationFrame(animate);
       if (pausedRef.current || document.hidden) {
@@ -203,24 +217,26 @@ export const ShipShowcase: React.FC<ShipShowcaseProps> = ({
       }
       const delta = Math.min((now - previous) / 1000, 0.05);
       previous = now;
+      elapsed += delta;
       if (
         renderer.getPixelRatio() !==
         Math.min(window.devicePixelRatio || 1, 1.75)
       )
         resize();
-      if (Math.abs(targetRotation - rotation) > 0.0001) {
-        rotation = THREE.MathUtils.lerp(
-          rotation,
-          targetRotation,
-          1 - Math.exp(-12 * delta),
-        );
-        if (Math.abs(targetRotation - rotation) < 0.0001)
-          rotation = targetRotation;
-        turntable.rotation.y = rotation;
-        needsRender = true;
-      }
-      if (needsRender) {
-        composer.render();
+      const moving = transfer.update(delta);
+      const ambient = hangar.update(
+        elapsed,
+        delta,
+        transfer.busy,
+        reducedMotion.matches,
+      );
+      needsRender ||= moving || ambient;
+      if (
+        needsRender &&
+        (moving || pointer || now - lastRender >= 1000 / 30 - 1)
+      ) {
+        draw();
+        lastRender = now;
         needsRender = false;
       }
     };
@@ -236,7 +252,8 @@ export const ShipShowcase: React.FC<ShipShowcaseProps> = ({
       canvas.removeEventListener("pointercancel", pointerUp);
       canvas.removeEventListener("lostpointercapture", pointerUp);
       loadRef.current = null;
-      parkedDisplay?.dispose();
+      reducedMotion.removeEventListener("change", motionChanged);
+      transfer.dispose();
       hangar.dispose();
       environment.dispose();
       renderPass.dispose();

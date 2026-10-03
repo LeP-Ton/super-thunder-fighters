@@ -1,0 +1,1137 @@
+{
+  "errors": [],
+  "geometry": {
+    "states": [
+      {
+        "phase": "empty",
+        "requestedKind": "vanguard",
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "parked",
+        "currentKind": "vanguard",
+        "requestedKind": "vanguard",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": 0,
+        "ready": true
+      },
+      {
+        "phase": "parked",
+        "currentKind": "vanguard",
+        "requestedKind": "vanguard",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": 0,
+        "ready": true
+      },
+      {
+        "phase": "parked",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": 8.299907077475808,
+        "ready": false
+      },
+      {
+        "phase": "aligning",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": 2.016721770296222,
+        "ready": false
+      },
+      {
+        "phase": "aligning",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": 2.016721770296222,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "aegis",
+        "position": [
+          0,
+          1.260305514637311,
+          -11.428571428571454
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "aegis",
+        "position": [
+          0,
+          1.260305514637311,
+          -11.428571428571454
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "nova",
+        "position": [
+          0,
+          1.260305514637311,
+          -11.428571428571454
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "nova",
+        "position": [
+          0,
+          1.260305514637311,
+          -11.428571428571454
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "arriving",
+        "currentKind": "nova",
+        "requestedKind": "nova",
+        "position": [
+          0,
+          0,
+          32
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "parked",
+        "currentKind": "nova",
+        "requestedKind": "nova",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": 0,
+        "ready": true
+      },
+      {
+        "phase": "parked",
+        "currentKind": "nova",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "parked",
+        "currentKind": "nova",
+        "requestedKind": "nova",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": 0,
+        "ready": true
+      },
+      {
+        "phase": "parked",
+        "currentKind": "nova",
+        "requestedKind": "nova",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": 0,
+        "ready": true
+      },
+      {
+        "phase": "parked",
+        "currentKind": "nova",
+        "requestedKind": "tempest",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "aligning",
+        "currentKind": "nova",
+        "requestedKind": "tempest",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "aligning",
+        "currentKind": "nova",
+        "requestedKind": "tempest",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "parked",
+        "currentKind": "nova",
+        "requestedKind": "nova",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": 0,
+        "ready": true
+      },
+      {
+        "phase": "parked",
+        "currentKind": "nova",
+        "requestedKind": "nova",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": 0,
+        "ready": true
+      },
+      {
+        "phase": "parked",
+        "currentKind": "nova",
+        "requestedKind": "nova",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": 0,
+        "ready": true
+      },
+      {
+        "phase": "parked",
+        "currentKind": "nova",
+        "requestedKind": "tempest",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "aligning",
+        "currentKind": "nova",
+        "requestedKind": "tempest",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "aligning",
+        "currentKind": "nova",
+        "requestedKind": "tempest",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "nova",
+        "requestedKind": "tempest",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "parked",
+        "currentKind": "tempest",
+        "requestedKind": "tempest",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": 0,
+        "ready": true
+      }
+    ],
+    "departure": [
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          0.002406818749513504,
+          -0.07936507936507937
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          0.004602245706970254,
+          -0.12400793650793653
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          0.00778428568456808,
+          -0.17857142857142855
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          0.012096829656545518,
+          -0.24305555555555552
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          0.01766710350951328,
+          -0.3174603174603175
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          0.024606206320478392,
+          -0.40178571428571436
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          0.033009648634868376,
+          -0.4960317460317461
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          0.0429578907445554,
+          -0.6001984126984128
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          0.05451688096588043,
+          -0.7142857142857142
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          0.06773859391767732,
+          -0.8382936507936508
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          0.08266156879929713,
+          -0.9722222222222221
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          0.09931144766863208,
+          -1.1160714285714286
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          0.11770151372013983,
+          -1.26984126984127
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          0.13783322956286762,
+          -1.433531746031746
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          0.1596967754984764,
+          -1.6071428571428574
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          0.18327158779926508,
+          -1.7906746031746033
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          0.20852689698619425,
+          -1.9841269841269844
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          0.23542226610691142,
+          -2.1875
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          0.2639081290137735,
+          -2.400793650793651
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          0.29392632864187246,
+          -2.624007936507936
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          0.32541065528705915,
+          -2.8571428571428568
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          0.35828738488396644,
+          -3.1001984126984126
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          0.392475817284035,
+          -3.3531746031746033
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          0.4278888145335359,
+          -3.6160714285714275
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          0.464433339151596,
+          -3.8888888888888884
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          0.5020109924082213,
+          -4.171626984126984
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          0.5405185526023215,
+          -4.464285714285714
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          0.5798485133397338,
+          -4.766865079365079
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          0.619889621811248,
+          -5.07936507936508
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          0.6605274170706288,
+          -5.401785714285715
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          0.7016447683126419,
+          -5.734126984126988
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          0.7431224131510772,
+          -6.076388888888893
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          0.7848394958967727,
+          -6.428571428571433
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          0.82667410583564,
+          -6.79067460317461
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          0.8685038155066866,
+          -7.16269841269842
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          0.9102062189800414,
+          -7.5446428571428665
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          0.951659470134978,
+          -7.936507936507947
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          0.99274282093794,
+          -8.338293650793663
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          1.0333371597205634,
+          -8.750000000000014
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          1.0733255494577028,
+          -9.171626984126998
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          1.1125937660454543,
+          -9.60317460317462
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          1.1510308365791795,
+          -10.044642857142877
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          1.18852957763153,
+          -10.496031746031766
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          1.2249871335304727,
+          -10.957341269841292
+        ],
+        "rotation": 0,
+        "ready": false
+      },
+      {
+        "phase": "departing",
+        "currentKind": "vanguard",
+        "requestedKind": "strider",
+        "position": [
+          0,
+          1.260305514637311,
+          -11.428571428571454
+        ],
+        "rotation": 0,
+        "ready": false
+      }
+    ],
+    "arriving": {
+      "phase": "arriving",
+      "currentKind": "nova",
+      "requestedKind": "nova",
+      "position": [
+        0,
+        0,
+        25.91407889116572
+      ],
+      "rotation": 0,
+      "ready": false
+    },
+    "final": {
+      "phase": "parked",
+      "currentKind": "nova",
+      "requestedKind": "nova",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "rotation": 0,
+      "ready": true
+    },
+    "floor": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "waiting": {
+      "phase": "parked",
+      "currentKind": "nova",
+      "requestedKind": "strider",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "rotation": 0,
+      "ready": false
+    },
+    "cancelled": {
+      "phase": "parked",
+      "currentKind": "nova",
+      "requestedKind": "nova",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "rotation": 0,
+      "ready": true
+    },
+    "reduced": {
+      "phase": "parked",
+      "currentKind": "tempest",
+      "requestedKind": "tempest",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "rotation": 0,
+      "ready": true
+    },
+    "sourceDisposals": 0,
+    "armsBefore": [
+      0.35,
+      -0.49607714463172925
+    ],
+    "armsAfter": [
+      0.4918675999174308,
+      -0.36521269794749023
+    ],
+    "armsRetracted": [
+      0.8718675999174308,
+      -0.7452126979474902
+    ],
+    "initialHidden": true,
+    "passing": true,
+    "outside": [
+      [
+        0,
+        6.049808121368677,
+        -43
+      ],
+      [
+        -4.5,
+        7.199808121368678,
+        -46.3
+      ],
+      [
+        -9,
+        8.349808121368676,
+        -49.6
+      ]
+    ],
+    "intervalHidden": true,
+    "reducedHidden": true
+  },
+  "homeFinal": {
+    "phase": "parked",
+    "shipKind": "tempest"
+  },
+  "rapidFinal": {
+    "phase": "parked",
+    "shipKind": "specter"
+  },
+  "pauseResume": true,
+  "reducedMotion": {
+    "phase": "parked",
+    "shipKind": "vanguard"
+  },
+  "ambientPerformance": {
+    "renderedFrames": 90,
+    "seconds": 3.0094999999642384,
+    "renderFps": 29.90529988405697
+  },
+  "transitionPerformance": {
+    "renderedFrames": 267,
+    "seconds": 5.712800000000003,
+    "renderFps": 46.737151659431426
+  }
+}

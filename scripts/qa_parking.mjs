@@ -16,6 +16,10 @@ const results = { dimensions: [], models: [], selections: [], errors: [] };
 const settle = () => new Promise((resolve) => setTimeout(resolve, 250));
 try {
   const page = await browser.newPage();
+  // 冻结环境动作后比较冷启动像素，避免把检修臂活动或 AO 的逐帧采样当成相机漂移。
+  await page.emulateMediaFeatures([
+    { name: "prefers-reduced-motion", value: "reduce" },
+  ]);
   page.on("pageerror", (error) => results.errors.push(error.message));
   page.on("console", (message) => {
     if (message.type() === "error") results.errors.push(message.text());
@@ -103,6 +107,9 @@ try {
     noPlaceholder: true,
     launchLabelStable: true,
   };
+  await page.emulateMediaFeatures([
+    { name: "prefers-reduced-motion", value: "no-preference" },
+  ]);
   page.off("request", handleRequest);
   await page.setRequestInterception(false);
   // 连续切换像素密度，包含 CSS 尺寸不变的跨屏场景。

@@ -33,6 +33,17 @@ export function createHangarDetails() {
   const unitCylinder = new THREE.CylinderGeometry(1, 1, 1, 20);
   [unitBox, roundedBox, unitCylinder].forEach((g) => geometries.add(g));
   const meshes: THREE.Mesh[] = [];
+  const parents = new Map<THREE.Mesh, THREE.Group>();
+  let assembly = group;
+  const arms: Array<{
+    side: number;
+    base: THREE.Group;
+    shoulder: THREE.Group;
+    elbow: THREE.Group;
+    wrist: THREE.Group;
+    piston: THREE.Mesh;
+    sleeve: THREE.Mesh;
+  }> = [];
   const add = (
     geometry: THREE.BufferGeometry,
     surface: THREE.Material,
@@ -45,6 +56,7 @@ export function createHangarDetails() {
     mesh.scale.set(...scale);
     mesh.castShadow = shadow;
     meshes.push(mesh);
+    parents.set(mesh, assembly);
     return mesh;
   };
   const box = (
@@ -305,29 +317,38 @@ export function createHangarDetails() {
     box([x, 0.18, z], [1.65, 0.36, 1.85], dark, true, true);
     box([x, 0.55, z], [1.1, 0.42, 1.25], armor, true, true);
     add(unitCylinder, steel, [x, 0.91, z], [0.46, 0.27, 0.46]);
-    const a: [number, number, number] = [x, 1.12, z];
-    const b: [number, number, number] = [x + side * 0.85, 2.86, z - 0.3];
-    const c: [number, number, number] = [x - side * 0.6, 3.3, z - 1.5];
-    beam(a, b, 0.49, 0.54, ceramic);
-    beam(b, c, 0.37, 0.42, armor);
-    rod(
-      [x - side * 0.2, 1.22, z + 0.29],
-      [x + side * 0.52, 2.59, z + 0.06],
-      0.07,
-      steel,
-    );
-    rod(
-      [x - side * 0.2, 1.22, z + 0.29],
-      [x + side * 0.17, 1.95, z + 0.17],
-      0.13,
-      dark,
-    );
-    for (const p of [a, b, c]) {
-      rod([p[0], p[1], p[2] - 0.32], [p[0], p[1], p[2] + 0.32], 0.28, steel);
-      rod([p[0], p[1], p[2] + 0.33], [p[0], p[1], p[2] + 0.38], 0.18, orange);
+    const base = new THREE.Group();
+    base.name = `检修臂_${side}`;
+    base.position.set(x, 1.12, z);
+    group.add(base);
+    const shoulder = new THREE.Group();
+    const elbow = new THREE.Group();
+    const wrist = new THREE.Group();
+    base.add(shoulder);
+    elbow.position.y = 2;
+    shoulder.add(elbow);
+    wrist.position.y = 1.7;
+    elbow.add(wrist);
+    // 每段连杆在自己的关节坐标下合批，转动时不必重建零件或整舱实例矩阵。
+    for (const joint of [shoulder, elbow, wrist]) {
+      assembly = joint;
+      rod([0, 0, -0.32], [0, 0, 0.32], 0.28, steel);
+      rod([0, 0, 0.33], [0, 0, 0.38], 0.18, orange);
     }
-    box([c[0], c[1] - 0.23, c[2]], [0.53, 0.29, 0.67], dark, true);
-    box([c[0], c[1] - 0.4, c[2]], [0.34, 0.035, 0.44], ice);
+    assembly = shoulder;
+    box([0, 1, 0], [0.49, 2, 0.54], ceramic, true, true);
+    box([0, 1, 0.29], [0.12, 1.35, 0.04], steel);
+    assembly = elbow;
+    box([0, 0.85, 0], [0.37, 1.7, 0.42], armor, true, true);
+    box([0, 0.85, 0.23], [0.09, 1.15, 0.035], ceramic);
+    assembly = wrist;
+    box([0, -0.23, 0], [0.53, 0.29, 0.67], dark, true);
+    box([0, -0.4, 0], [0.34, 0.035, 0.44], ice);
+    const piston = new THREE.Mesh(unitCylinder, steel);
+    const sleeve = new THREE.Mesh(unitCylinder, dark);
+    base.add(piston, sleeve);
+    arms.push({ side, base, shoulder, elbow, wrist, piston, sleeve });
+    assembly = group;
     sign(2, [x, 1.04, z + 0.66], 0.83);
     // 设备车与落地诊断台。
     const cartX = side * 10.1;
@@ -400,7 +421,7 @@ export function createHangarDetails() {
 
   const batches = new Map<string, THREE.Mesh[]>();
   for (const mesh of meshes) {
-    const key = `${mesh.geometry.uuid}:${(mesh.material as THREE.Material).uuid}:${mesh.castShadow}`;
+    const key = `${parents.get(mesh)!.uuid}:${mesh.geometry.uuid}:${(mesh.material as THREE.Material).uuid}:${mesh.castShadow}`;
     const batch = batches.get(key) ?? [];
     batch.push(mesh);
     batches.set(key, batch);
@@ -417,12 +438,44 @@ export function createHangarDetails() {
       mesh.updateMatrix();
       instances.setMatrixAt(i, mesh.matrix);
     });
-    group.add(instances);
+    parents.get(batch[0])!.add(instances);
   }
+  const axis = new THREE.Vector3(0, 1, 0);
+  const hingeAxis = new THREE.Vector3(0, 0, 1);
+  const anchor = new THREE.Vector3();
+  const end = new THREE.Vector3();
+  const direction = new THREE.Vector3();
+  const update = (time: number, clearance: number) => {
+    for (const arm of arms) {
+      const phase = time * 0.62 + (arm.side > 0 ? 1.8 : 0);
+      arm.base.rotation.y = Math.sin(phase * 0.55) * 0.23 * (1 - clearance);
+      arm.shoulder.rotation.z =
+        -arm.side * (0.35 + Math.sin(phase) * 0.15 + clearance * 0.38);
+      arm.elbow.rotation.z =
+        arm.side * (1.75 + Math.sin(phase + 0.8) * 0.24 - clearance * 0.72);
+      arm.wrist.rotation.z = -arm.shoulder.rotation.z - arm.elbow.rotation.z;
+      arm.wrist.rotation.y = Math.sin(phase * 0.8) * 0.3;
+      // 活塞两端绑定基座与上臂，关节改变时伸缩，避免液压杆脱离铰点。
+      anchor.set(-arm.side * 0.2, 0.1, 0.34);
+      end.set(0, 1.62, 0.34).applyAxisAngle(hingeAxis, arm.shoulder.rotation.z);
+      direction.copy(end).sub(anchor);
+      arm.piston.position.copy(anchor).addScaledVector(direction, 0.5);
+      arm.piston.scale.set(0.07, direction.length(), 0.07);
+      arm.piston.quaternion.setFromUnitVectors(
+        axis,
+        end.copy(direction).normalize(),
+      );
+      arm.sleeve.position.copy(anchor).addScaledVector(direction, 0.25);
+      arm.sleeve.scale.set(0.13, direction.length() * 0.5, 0.13);
+      arm.sleeve.quaternion.copy(arm.piston.quaternion);
+    }
+  };
+  update(0, 0);
   return {
     group,
+    update,
     dispose() {
-      group.children.forEach((child) => {
+      group.traverse((child) => {
         if (child instanceof THREE.InstancedMesh) child.dispose();
       });
       geometries.forEach((g) => g.dispose());
