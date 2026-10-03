@@ -22,6 +22,7 @@
 - Blender 坐标 Z 向上、机首 +Y；GLB 坐标 Y 向上、机首 -Z。`exhaust_*` 空节点是喷口挂点，优化不能移除。
 - 首页/机库/情报共用实时 3D 展示；斜视缩略图和俯视降级图由 `scripts/render_previews.py` 生成，禁止独立更换成不匹配的机体图片。
 - `render/hangarEnvironment.ts` 构建首页、机库和情报共用的 3D 舱室、地板、结构梁、舱门、行星与平面反射；所有物体共用世界坐标，地面 y=0、舱口位于 -Z。`frameHangarCamera` 按容器尺寸固定取景，加载和切机不得改变相机构图。
+- `render/hangarDetails.ts` 负责可重复的检修设施、机械件与标识图集，按几何/材质实例化并释放自身资源。展示通过 `ShipShowcase` 的 EffectComposer、GTAO（环境遮蔽）和 OutputPass 绘制；环境遮蔽按 CSS 分辨率计算，静止时不重复绘制，不进入战斗渲染链。
 - `render/parkedDisplay.ts` 仅负责展示用起落架、机位标线与停放材质；不能改变战斗模型或碰撞。机首默认朝 -Z，检视时只旋转机体。展示材质有变化时必须克隆，禁止修改共享模型材质。
 - `ShipShowcase` 将场景生命周期与机型加载分离，切机复用场景和画布；冷启动直接显示 3D 舱室，静态模型预览仅用于 WebGL 不可用或模型失败的降级。
 - 展示 Canvas 的 CSS 尺寸必须与 DPR（设备像素比）渲染缓冲区分离；取景按容器尺寸统一计算，验收需覆盖高分屏与跨屏 DPR 变化。

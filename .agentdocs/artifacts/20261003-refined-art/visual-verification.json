@@ -1,0 +1,89 @@
+{
+  "performance": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2,
+    "seconds": 6.013999999988078,
+    "frames": 361,
+    "fps": 60,
+    "p95FrameMs": 16.7,
+    "over33ms": 0
+  },
+  "assets": [
+    {
+      "kind": "vanguard",
+      "triangles": 69314,
+      "vertices": 117630,
+      "meshes": 9,
+      "sockets": 2
+    },
+    {
+      "kind": "strider",
+      "triangles": 67894,
+      "vertices": 114258,
+      "meshes": 9,
+      "sockets": 2
+    },
+    {
+      "kind": "tempest",
+      "triangles": 105675,
+      "vertices": 178382,
+      "meshes": 9,
+      "sockets": 4
+    },
+    {
+      "kind": "aegis",
+      "triangles": 72084,
+      "vertices": 123267,
+      "meshes": 9,
+      "sockets": 2
+    },
+    {
+      "kind": "nova",
+      "triangles": 73643,
+      "vertices": 125014,
+      "meshes": 9,
+      "sockets": 2
+    },
+    {
+      "kind": "specter",
+      "triangles": 68371,
+      "vertices": 116063,
+      "meshes": 9,
+      "sockets": 2
+    },
+    {
+      "kind": "grunt",
+      "triangles": 66197,
+      "vertices": 115069,
+      "meshes": 9,
+      "sockets": 2
+    },
+    {
+      "kind": "kamikaze",
+      "triangles": 66329,
+      "vertices": 114875,
+      "meshes": 9,
+      "sockets": 2
+    },
+    {
+      "kind": "elite",
+      "triangles": 71326,
+      "vertices": 124380,
+      "meshes": 9,
+      "sockets": 2
+    },
+    {
+      "kind": "super",
+      "triangles": 104282,
+      "vertices": 180340,
+      "meshes": 9,
+      "sockets": 4
+    }
+  ],
+  "detailStats": {
+    "batches": 22,
+    "instances": 1162
+  },
+  "errors": []
+}

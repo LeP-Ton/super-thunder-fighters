@@ -1,5 +1,7 @@
 import * as THREE from "three";
 import { Reflector } from "three/addons/objects/Reflector.js";
+import { RectAreaLightUniformsLib } from "three/addons/lights/RectAreaLightUniformsLib.js";
+import { createHangarDetails } from "./hangarDetails";
 
 /** 机库与战机共享世界坐标：地面 y=0，舱门位于 -Z，默认机首朝舱外。 */
 export function createHangarEnvironment(invalidate: () => void) {
@@ -75,6 +77,39 @@ export function createHangarEnvironment(invalidate: () => void) {
   ctx.strokeStyle = "#778083";
   ctx.lineWidth = 1;
   ctx.strokeRect(5, 5, 502, 502);
+  // 嵌入地板的装甲拼缝与检修条，使用低对比纹理保留大面积地面的安静感。
+  const plate = (x: number, y: number, width: number, height: number) => {
+    ctx.beginPath();
+    ctx.moveTo(x + 12, y);
+    ctx.lineTo(x + width - 12, y);
+    ctx.lineTo(x + width, y + 12);
+    ctx.lineTo(x + width, y + height - 12);
+    ctx.lineTo(x + width - 12, y + height);
+    ctx.lineTo(x + 12, y + height);
+    ctx.lineTo(x, y + height - 12);
+    ctx.lineTo(x, y + 12);
+    ctx.closePath();
+    ctx.stroke();
+  };
+  ctx.strokeStyle = "#303c42";
+  ctx.lineWidth = 2;
+  plate(27, 32, 458, 190);
+  plate(27, 239, 458, 241);
+  ctx.strokeStyle = "#636d70";
+  ctx.lineWidth = 1;
+  plate(30, 35, 452, 184);
+  plate(30, 242, 452, 235);
+  for (const y of [43, 209, 251, 465])
+    for (const x of [39, 473]) {
+      ctx.fillStyle = "#29353a";
+      ctx.fillRect(x - 3, y - 3, 6, 6);
+      ctx.fillStyle = "#7c8483";
+      ctx.fillRect(x - 2, y, 4, 1);
+    }
+  ctx.fillStyle = "#333f43";
+  ctx.fillRect(227, 439, 58, 17);
+  ctx.fillStyle = "#727974";
+  for (let i = 0; i < 6; i++) ctx.fillRect(233 + i * 8, 444, 4, 6);
   for (const x of [14, 498])
     for (const y of [14, 498]) {
       ctx.fillStyle = "#232b2d";
@@ -91,7 +126,7 @@ export function createHangarEnvironment(invalidate: () => void) {
   const deck = material("#646f76", 0.62, 0.6);
   deck.map = deckMap;
   deck.bumpMap = deckMap;
-  deck.bumpScale = 0.025;
+  deck.bumpScale = 0.055;
   box(0, -0.15, 1, 48, 0.3, 72, deck);
 
   // 低强度平面反射把机体、舱门和灯光联系到同一块地面；仅在场景变化时更新。
@@ -110,8 +145,22 @@ export function createHangarEnvironment(invalidate: () => void) {
   reflectionMaterial.transparent = true;
   reflectionMaterial.depthWrite = false;
   reflectionMaterial.fragmentShader = reflectionMaterial.fragmentShader.replace(
+    "vec4 base = texture2DProj( tDiffuse, vUv );",
+    `vec2 uv = vUv.xy / vUv.w;
+    vec2 blur = vec2(3.5 / 768.0);
+    vec4 base = texture2D(tDiffuse, uv) * 0.20;
+    base += texture2D(tDiffuse, uv + vec2(blur.x, 0.0)) * 0.12;
+    base += texture2D(tDiffuse, uv - vec2(blur.x, 0.0)) * 0.12;
+    base += texture2D(tDiffuse, uv + vec2(0.0, blur.y)) * 0.12;
+    base += texture2D(tDiffuse, uv - vec2(0.0, blur.y)) * 0.12;
+    base += texture2D(tDiffuse, uv + blur) * 0.08;
+    base += texture2D(tDiffuse, uv - blur) * 0.08;
+    base += texture2D(tDiffuse, uv + vec2(blur.x, -blur.y)) * 0.08;
+    base += texture2D(tDiffuse, uv + vec2(-blur.x, blur.y)) * 0.08;`,
+  );
+  reflectionMaterial.fragmentShader = reflectionMaterial.fragmentShader.replace(
     "#include <colorspace_fragment>",
-    "#include <colorspace_fragment>\ngl_FragColor.a = 0.14;",
+    "#include <colorspace_fragment>\ngl_FragColor.a = 0.055;",
   );
   group.add(reflection);
 
@@ -204,6 +253,9 @@ export function createHangarEnvironment(invalidate: () => void) {
     group.add(instances);
   }
 
+  const details = createHangarDetails();
+  group.add(details.group);
+
   const outside = new THREE.Group();
   group.add(outside);
   const globeGeometry = new THREE.SphereGeometry(85, 96, 64);
@@ -244,7 +296,7 @@ export function createHangarEnvironment(invalidate: () => void) {
   atmosphere.scale.setScalar(1.012);
   outside.add(atmosphere);
 
-  const sun = new THREE.DirectionalLight("#f5e6d0", 1.7);
+  const sun = new THREE.DirectionalLight("#f5e6d0", 1.2);
   sun.position.set(-18, 26, -38);
   sun.target.position.set(0, 0, 0);
   sun.castShadow = true;
@@ -260,18 +312,32 @@ export function createHangarEnvironment(invalidate: () => void) {
   sun.shadow.normalBias = 0.015;
   sun.shadow.bias = -0.0001;
   group.add(sun, sun.target);
-  group.add(new THREE.HemisphereLight("#b0c7d6", "#38434b", 1.1));
-  const overhead = new THREE.DirectionalLight("#d9e7f1", 1.1);
+  group.add(new THREE.HemisphereLight("#b0c7d6", "#38434b", 1.35));
+  const overhead = new THREE.DirectionalLight("#d9e7f1", 0.8);
   overhead.position.set(2, 15, 8);
   group.add(overhead);
   const rim = new THREE.DirectionalLight("#ffbe88", 1.0);
   rim.position.set(12, 4, -12);
   group.add(rim);
 
+  // 大面光在装甲上形成连续高光，避免小零件在硬直射光下变成一片黑白噪点。
+  RectAreaLightUniformsLib.init();
+  const key = new THREE.RectAreaLight("#d5e9f4", 3.5, 11, 8);
+  key.position.set(-3, 9, 2);
+  key.lookAt(0, 0, 0);
+  const service = new THREE.RectAreaLight("#ffc999", 2, 5, 5);
+  service.position.set(9, 5, -3);
+  service.lookAt(0, 1, 0);
+  group.add(key, service);
+
   return {
     group,
     dispose() {
       disposed = true;
+      details.dispose();
+      group.children.forEach((child) => {
+        if (child instanceof THREE.InstancedMesh) child.dispose();
+      });
       geometries.forEach((value) => value.dispose());
       materials.forEach((value) => value.dispose());
       textures.forEach((value) => value.dispose());

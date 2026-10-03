@@ -29,8 +29,15 @@
 - 源 `.blend` 保留可编辑部件和打包的基色、粗糙度、法线贴图。
 - Blender 中 Z 向上，机首 +Y；GLB 中 Y 向上，机首 -Z。
 - `exhaust_0` 等空节点是尾焰挂点，局部 +Z 指向喷口后方，禁止在优化时删除。
-- 导出时按材质合并为 8–9 个绘制批次；GLB 使用 Meshopt 几何压缩与 WebP 贴图。浏览器加载器已配置随 Three.js 本地提供的解码器。
+- 导出时按材质合并为 9 个绘制批次；GLB 使用 Meshopt 几何压缩与 WebP 贴图。浏览器加载器已配置随 Three.js 本地提供的解码器。
 - 斜视预览与 Canvas 2D 俯视图均从同一份最终模型生成。敌方俯视图由运行时旋转 180°。
+
+## 精细结构
+
+- 会话-6 增加分区翼面蒙皮、三段倒角、连续曲面风挡与压框、封闭后舱、背部能源脊柱、冷却管线、姿态控制喷嘴、检修锁扣与尾舵接缝。
+- 矢量喷口包含中空收敛段、18 片外部瓣片、内部涡轮、燃烧室热环与液压连杆；Shipyard 外壳前移，避免遮挡新建内腔。
+- 重型机增加复合陶瓷装甲，电磁炮机增加线圈散热套，隐身机增加低矮导流脊；保留十种机型各自的轮廓与动力布局。
+- 当前单机约 6.6–10.6 万三角面；所有新部件在 `.blend` 中保留独立名称和修改器。预览按投影包围盒取景，避免前掠翼或宽翼被裁切。
 
 ## 重建
 
@@ -49,4 +56,4 @@ python scripts/render_previews.py --source assets/model-sources/vanguard.blend -
 python scripts/render_previews.py --source assets/model-sources/vanguard.blend --output public/assets/ships/vanguard.png --top
 ```
 
-建模脚本支持 `--only vanguard` 等参数；预览脚本支持 `--hero` 输出大幅检视图。优化脚本特意关闭 `flatten`、`join` 和 `prune`，避免挂点被移除。
+建模脚本支持 `--only vanguard` 等参数；预览脚本支持 `--hero` 输出大幅检视图，`--rear` 输出后侧视图检查喷口。优化脚本特意关闭 `flatten`、`join` 和 `prune`，避免挂点被移除。

@@ -1,0 +1,262 @@
+[
+  {
+    "image": "public/assets/previews/aegis.png",
+    "alphaBounds": [
+      43,
+      149,
+      531,
+      467
+    ],
+    "size": [
+      640,
+      640
+    ]
+  },
+  {
+    "image": "public/assets/previews/elite.png",
+    "alphaBounds": [
+      84,
+      138,
+      590,
+      482
+    ],
+    "size": [
+      640,
+      640
+    ]
+  },
+  {
+    "image": "public/assets/previews/grunt.png",
+    "alphaBounds": [
+      56,
+      134,
+      584,
+      488
+    ],
+    "size": [
+      640,
+      640
+    ]
+  },
+  {
+    "image": "public/assets/previews/kamikaze.png",
+    "alphaBounds": [
+      78,
+      114,
+      571,
+      514
+    ],
+    "size": [
+      640,
+      640
+    ]
+  },
+  {
+    "image": "public/assets/previews/nova.png",
+    "alphaBounds": [
+      50,
+      136,
+      587,
+      486
+    ],
+    "size": [
+      640,
+      640
+    ]
+  },
+  {
+    "image": "public/assets/previews/specter.png",
+    "alphaBounds": [
+      43,
+      176,
+      492,
+      426
+    ],
+    "size": [
+      640,
+      640
+    ]
+  },
+  {
+    "image": "public/assets/previews/strider.png",
+    "alphaBounds": [
+      113,
+      133,
+      570,
+      495
+    ],
+    "size": [
+      640,
+      640
+    ]
+  },
+  {
+    "image": "public/assets/previews/super.png",
+    "alphaBounds": [
+      42,
+      150,
+      555,
+      468
+    ],
+    "size": [
+      640,
+      640
+    ]
+  },
+  {
+    "image": "public/assets/previews/tempest.png",
+    "alphaBounds": [
+      65,
+      138,
+      590,
+      482
+    ],
+    "size": [
+      640,
+      640
+    ]
+  },
+  {
+    "image": "public/assets/previews/vanguard.png",
+    "alphaBounds": [
+      45,
+      145,
+      550,
+      477
+    ],
+    "size": [
+      640,
+      640
+    ]
+  },
+  {
+    "image": "public/assets/ships/aegis.png",
+    "alphaBounds": [
+      36,
+      68,
+      604,
+      572
+    ],
+    "size": [
+      640,
+      640
+    ]
+  },
+  {
+    "image": "public/assets/ships/elite.png",
+    "alphaBounds": [
+      60,
+      36,
+      580,
+      604
+    ],
+    "size": [
+      640,
+      640
+    ]
+  },
+  {
+    "image": "public/assets/ships/grunt.png",
+    "alphaBounds": [
+      36,
+      44,
+      604,
+      596
+    ],
+    "size": [
+      640,
+      640
+    ]
+  },
+  {
+    "image": "public/assets/ships/kamikaze.png",
+    "alphaBounds": [
+      145,
+      36,
+      495,
+      605
+    ],
+    "size": [
+      640,
+      640
+    ]
+  },
+  {
+    "image": "public/assets/ships/nova.png",
+    "alphaBounds": [
+      79,
+      36,
+      561,
+      604
+    ],
+    "size": [
+      640,
+      640
+    ]
+  },
+  {
+    "image": "public/assets/ships/specter.png",
+    "alphaBounds": [
+      36,
+      127,
+      604,
+      514
+    ],
+    "size": [
+      640,
+      640
+    ]
+  },
+  {
+    "image": "public/assets/ships/strider.png",
+    "alphaBounds": [
+      107,
+      36,
+      533,
+      605
+    ],
+    "size": [
+      640,
+      640
+    ]
+  },
+  {
+    "image": "public/assets/ships/super.png",
+    "alphaBounds": [
+      41,
+      36,
+      599,
+      605
+    ],
+    "size": [
+      640,
+      640
+    ]
+  },
+  {
+    "image": "public/assets/ships/tempest.png",
+    "alphaBounds": [
+      37,
+      36,
+      603,
+      605
+    ],
+    "size": [
+      640,
+      640
+    ]
+  },
+  {
+    "image": "public/assets/ships/vanguard.png",
+    "alphaBounds": [
+      38,
+      36,
+      603,
+      605
+    ],
+    "size": [
+      640,
+      640
+    ]
+  }
+]

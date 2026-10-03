@@ -1,6 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+import { GTAOPass } from "three/addons/postprocessing/GTAOPass.js";
+import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
 import { loadShipAsset } from "../render/modelLibrary";
 import { createParkedDisplay } from "../render/parkedDisplay";
 import {
@@ -74,7 +78,7 @@ export const ShipShowcase: React.FC<ShipShowcaseProps> = ({
     const generator = new THREE.PMREMGenerator(renderer);
     const environment = generator.fromScene(environmentScene, 0.04);
     scene.environment = environment.texture;
-    scene.environmentIntensity = 0.38;
+    scene.environmentIntensity = 0.52;
     environmentScene.dispose();
     generator.dispose();
 
@@ -84,6 +88,27 @@ export const ShipShowcase: React.FC<ShipShowcaseProps> = ({
     scene.add(hangar.group);
     const turntable = new THREE.Group();
     scene.add(turntable);
+    // 环境遮蔽补足装甲接缝、机械关节和接地点；只用于按需绘制的展示场景。
+    const target = new THREE.WebGLRenderTarget(1, 1, {
+      type: THREE.HalfFloatType,
+      samples: 4,
+    });
+    const composer = new EffectComposer(renderer, target);
+    const renderPass = new RenderPass(scene, camera);
+    const ao = new GTAOPass(scene, camera, 1, 1);
+    ao.updateGtaoMaterial({
+      radius: 0.65,
+      thickness: 0.8,
+      distanceFallOff: 0.8,
+      samples: 8,
+      scale: 1,
+    });
+    ao.updatePdMaterial({ radius: 5, samples: 8 });
+    ao.blendIntensity = 0.65;
+    const output = new OutputPass();
+    composer.addPass(renderPass);
+    composer.addPass(ao);
+    composer.addPass(output);
     let rotation = 0;
     let targetRotation = 0;
     let pointer: { id: number; x: number } | undefined;
@@ -128,6 +153,10 @@ export const ShipShowcase: React.FC<ShipShowcaseProps> = ({
       frameHangarCamera(camera, width, height, home);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
       renderer.setSize(width, height, false);
+      composer.setPixelRatio(renderer.getPixelRatio());
+      composer.setSize(width, height);
+      // AO 使用 CSS 分辨率，主体与轮廓仍按高分屏分辨率渲染。
+      ao.setSize(Math.round(width), Math.round(height));
       needsRender = true;
     };
     const observer = new ResizeObserver(resize);
@@ -155,7 +184,7 @@ export const ShipShowcase: React.FC<ShipShowcaseProps> = ({
           scene.add(next.markings);
           rotation = targetRotation = 0;
           turntable.rotation.y = 0;
-          renderer.render(scene, camera);
+          composer.render();
           needsRender = false;
           setReady(true);
         })
@@ -163,7 +192,7 @@ export const ShipShowcase: React.FC<ShipShowcaseProps> = ({
           if (!disposed && request === generation) setUnavailable(true);
         });
     };
-    renderer.render(scene, camera);
+    composer.render();
 
     let previous = performance.now();
     const animate = (now: number) => {
@@ -191,7 +220,7 @@ export const ShipShowcase: React.FC<ShipShowcaseProps> = ({
         needsRender = true;
       }
       if (needsRender) {
-        renderer.render(scene, camera);
+        composer.render();
         needsRender = false;
       }
     };
@@ -210,6 +239,13 @@ export const ShipShowcase: React.FC<ShipShowcaseProps> = ({
       parkedDisplay?.dispose();
       hangar.dispose();
       environment.dispose();
+      renderPass.dispose();
+      ao.dispose();
+      // 当前 Three.js 的 GTAOPass.dispose 尚未覆盖这两个合成材质。
+      ao.gtaoMaterial.dispose();
+      ao.blendMaterial.dispose();
+      output.dispose();
+      composer.dispose();
       renderer.dispose();
       renderer.forceContextLoss();
       renderer.domElement.remove();

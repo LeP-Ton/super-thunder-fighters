@@ -20,3 +20,5 @@ Use case: stylized-concept. Asset type: final vertical environment background fo
 ## 实时 3D 机库
 
 会话-5 的可编辑环境源为 `render/hangarEnvironment.ts`：程序建模的地板、工字梁、斜撑、舱门、出舱导轨、器材箱及检修格栅。地板接缝与磨损纹理由确定性 Canvas 绘制生成，无新增外部素材。舱外行星复用上述自有低轨海洋图，叠加大气层着色；地面使用低强度平面反射。停放机首沿 -Z 指向舱门，起落架与地板统一为 y=0。
+
+会话-6 增加 `render/hangarDetails.ts`：双层八角形舱框、液压闭锁、墙面护板、冷却管线及法兰、检修走廊、顶棚桁架、轨道吊架、双连杆机械臂、诊断设备车和停机位引导设施。几何零件按几何/材质合批为 InstancedMesh，标识共享一张 Canvas 图集。展示加入面光源和环境遮蔽，地板反射采用低强度九点模糊；新增内容均为项目原创程序几何，无外部素材依赖。

@@ -1,0 +1,175 @@
+{
+  "baseline": "660a9ca",
+  "models": [
+    {
+      "kind": "aegis",
+      "old": {
+        "vertices": 45323,
+        "triangles": 29128,
+        "meshes": 9,
+        "bytes": 527104,
+        "sockets": 2
+      },
+      "new": {
+        "vertices": 123267,
+        "triangles": 72084,
+        "meshes": 9,
+        "bytes": 1321440,
+        "sockets": 2
+      }
+    },
+    {
+      "kind": "elite",
+      "old": {
+        "vertices": 44375,
+        "triangles": 28790,
+        "meshes": 8,
+        "bytes": 513828,
+        "sockets": 2
+      },
+      "new": {
+        "vertices": 124380,
+        "triangles": 71326,
+        "meshes": 9,
+        "bytes": 1331224,
+        "sockets": 2
+      }
+    },
+    {
+      "kind": "grunt",
+      "old": {
+        "vertices": 43392,
+        "triangles": 27727,
+        "meshes": 8,
+        "bytes": 504968,
+        "sockets": 2
+      },
+      "new": {
+        "vertices": 115069,
+        "triangles": 66197,
+        "meshes": 9,
+        "bytes": 1243140,
+        "sockets": 2
+      }
+    },
+    {
+      "kind": "kamikaze",
+      "old": {
+        "vertices": 42711,
+        "triangles": 27530,
+        "meshes": 8,
+        "bytes": 499524,
+        "sockets": 2
+      },
+      "new": {
+        "vertices": 114875,
+        "triangles": 66329,
+        "meshes": 9,
+        "bytes": 1245912,
+        "sockets": 2
+      }
+    },
+    {
+      "kind": "nova",
+      "old": {
+        "vertices": 44294,
+        "triangles": 29128,
+        "meshes": 9,
+        "bytes": 517720,
+        "sockets": 2
+      },
+      "new": {
+        "vertices": 125014,
+        "triangles": 73643,
+        "meshes": 9,
+        "bytes": 1346224,
+        "sockets": 2
+      }
+    },
+    {
+      "kind": "specter",
+      "old": {
+        "vertices": 43105,
+        "triangles": 28063,
+        "meshes": 9,
+        "bytes": 498668,
+        "sockets": 2
+      },
+      "new": {
+        "vertices": 116063,
+        "triangles": 68371,
+        "meshes": 9,
+        "bytes": 1244032,
+        "sockets": 2
+      }
+    },
+    {
+      "kind": "strider",
+      "old": {
+        "vertices": 43505,
+        "triangles": 28364,
+        "meshes": 9,
+        "bytes": 509336,
+        "sockets": 2
+      },
+      "new": {
+        "vertices": 114258,
+        "triangles": 67894,
+        "meshes": 9,
+        "bytes": 1238644,
+        "sockets": 2
+      }
+    },
+    {
+      "kind": "super",
+      "old": {
+        "vertices": 68050,
+        "triangles": 44088,
+        "meshes": 8,
+        "bytes": 779948,
+        "sockets": 4
+      },
+      "new": {
+        "vertices": 180340,
+        "triangles": 104282,
+        "meshes": 9,
+        "bytes": 1928448,
+        "sockets": 4
+      }
+    },
+    {
+      "kind": "tempest",
+      "old": {
+        "vertices": 67348,
+        "triangles": 44299,
+        "meshes": 9,
+        "bytes": 772836,
+        "sockets": 4
+      },
+      "new": {
+        "vertices": 178382,
+        "triangles": 105675,
+        "meshes": 9,
+        "bytes": 1917340,
+        "sockets": 4
+      }
+    },
+    {
+      "kind": "vanguard",
+      "old": {
+        "vertices": 43196,
+        "triangles": 28210,
+        "meshes": 9,
+        "bytes": 503916,
+        "sockets": 2
+      },
+      "new": {
+        "vertices": 117630,
+        "triangles": 69314,
+        "meshes": 9,
+        "bytes": 1266508,
+        "sockets": 2
+      }
+    }
+  ]
+}
